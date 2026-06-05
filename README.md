@@ -1,3 +1,5 @@
+<img src="man/figures/logo.png" align="right" height="139" />
+
 # ropas
 
 R client for the [OPAS](https://opas.isprambiente.it) (OPen Air System)
