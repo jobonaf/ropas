@@ -60,11 +60,14 @@
 #'       derived from \code{measure_date_time}.  See the note on timestamps
 #'       in the Details section.}
 #'     \item{value_raw}{\code{measure_value} as returned by the API (not
-#'       converted).}
-#'     \item{post_validity_code}{Primary validity flag; see Details.}
+#'       converted); the source column \code{measure_value} is dropped.}
+#'     \item{post_validity_code}{Primary validity flag (0 = valid,
+#'       1 = reconstructed, negative = invalid).}
 #'     \item{series_id, station_id, station_name, parameter_name,
 #'       parameter_unit}{Series context columns, prepended for convenience.}
-#'     \item{...}{All remaining fields from the API response.}
+#'     \item{...}{All remaining API fields except \code{measure_value} and
+#'       \code{measure_date_time}, which are replaced by \code{value_raw}
+#'       and \code{datetime} respectively.}
 #'   }
 #'
 #' @export
@@ -72,18 +75,18 @@
 #' @examples
 #' \dontrun{
 #' # Last 24 hours
-#' opas_get_data(12900, last_hours = 24)
+#' opas_get_data(12345, last_hours = 24)
 #'
 #' # Last 7 daily aggregates
-#' opas_get_data(12900, last_days = 7)
+#' opas_get_data(12345, last_days = 7)
 #'
 #' # Custom range (raw hourly)
-#' opas_get_data(12900,
+#' opas_get_data(12345,
 #'               start = "2026-01-01T00:00:00",
 #'               end   = "2026-02-01T00:00:00")
 #'
 #' # Custom range (daily aggregates)
-#' opas_get_data(12900,
+#' opas_get_data(12345,
 #'               start = "2026-01-01T00:00:00",
 #'               end   = "2026-02-01T00:00:00",
 #'               daily = TRUE)
@@ -116,6 +119,9 @@ opas_get_data <- function(series_id,
   }
   
   series_id <- as.integer(series_id)
+  if (is.na(series_id)) {
+    rlang::abort("`series_id` must be numeric.")
+  }
   
   # --- Build path -----------------------------------------------------------
   
@@ -191,13 +197,21 @@ opas_get_data <- function(series_id,
   # Parse datetime with UTC+1 fixed timezone, consistent with the OPAS
   # server convention and the legal reference time for Italian AQ data.
   # TODO: confirm with ISPRA developers; revisit if explicit offsets appear.
-  df$datetime <- as.POSIXct(df$measure_date_time,
-                            format = "%Y-%m-%dT%H:%M:%S",
-                            tz     = "Etc/GMT-1")
+  df$datetime <- as.POSIXct(
+    df$measure_date_time,
+    format = "%Y-%m-%dT%H:%M:%S",
+    tz     = "Etc/GMT-1"
+  )
+  if (any(is.na(df$datetime))) {
+    rlang::warn("Some timestamps could not be parsed.")
+  }
   
-  # Convenience aliases for the two most-used fields.
-  df$value_raw      <- df$measure_value
-  df$validity_code  <- df$post_validity_code
+  # value_raw is an alias for measure_value, kept for a cleaner interface.
+  # The source column measure_value and the parsed measure_date_time are
+  # dropped to avoid redundancy; all other API fields are preserved as-is.
+  df$value_raw <- df$measure_value
+  drop_cols    <- c("measure_value", "measure_date_time")
+  df           <- df[, setdiff(names(df), drop_cols)]
   
   # Prepend series context columns.
   context <- tibble::tibble(
@@ -208,9 +222,9 @@ opas_get_data <- function(series_id,
     parameter_unit = data_obj$parameter_unit %||% NA_character_
   )
   
-  # Reorder: context + datetime + value_raw + validity_code + everything else.
-  priority <- c("datetime", "value_raw", "validity_code")
-  rest <- setdiff(names(df), priority)
+  # Reorder: context + datetime + value_raw + post_validity_code + rest.
+  priority <- c("datetime", "value_raw", "post_validity_code")
+  rest     <- setdiff(names(df), priority)
   
   dplyr::bind_cols(
     context[rep(1L, nrow(df)), ],

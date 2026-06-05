@@ -47,11 +47,14 @@ including:
 derived from \code{measure_date_time}.  See the note on timestamps
 in the Details section.}
 \item{value_raw}{\code{measure_value} as returned by the API (not
-converted).}
-\item{post_validity_code}{Primary validity flag; see Details.}
+converted); the source column \code{measure_value} is dropped.}
+\item{post_validity_code}{Primary validity flag (0 = valid,
+1 = reconstructed, negative = invalid).}
 \item{series_id, station_id, station_name, parameter_name,
 parameter_unit}{Series context columns, prepended for convenience.}
-\item{...}{All remaining fields from the API response.}
+\item{...}{All remaining API fields except \code{measure_value} and
+\code{measure_date_time}, which are replaced by \code{value_raw}
+and \code{datetime} respectively.}
 }
 }
 \description{
