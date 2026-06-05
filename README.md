@@ -2,11 +2,12 @@
 
 # ropas
 
-R client for the [OPAS](https://opas.isprambiente.it) (OPen Air System)
-REST API, maintained by ISPRA (Istituto Superiore per la Protezione e la
-Ricerca Ambientale). Provides access to the Italian national air quality
-monitoring network: station metadata, series catalogues, and hourly/daily
-measurements with validity codes.
+R client for the [OPAS](https://opas.isprambiente.it) (OPen Air System) REST API.
+
+OPAS is a shared platform used within the Italian National System for
+Environmental Protection (SNPA) for air quality monitoring data management.
+This package provides access to station metadata, time-series catalogues,
+and validated air quality observations available through the public API.
 
 ## Installation
 
