@@ -2,6 +2,11 @@
 
 # ropas
 
+<!-- badges: start -->
+  [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+  [![R-CMD-check](https://github.com/jobonaf/ropas/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jobonaf/ropas/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 R client for the [OPAS](https://opas.isprambiente.it) (OPen Air System)
 REST API, maintained by ISPRA (Istituto Superiore per la Protezione e la
 Ricerca Ambientale). Provides access to the Italian national air quality
