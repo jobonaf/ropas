@@ -139,3 +139,37 @@ opas_ensure_token <- function() {
   
   invisible(NULL)
 }
+
+
+#' Logout from OPAS API
+#'
+#' Invalidates the current session on the server and clears all
+#' authentication state from the internal environment.  After calling this
+#' function, \code{\link{opas_login}} must be called again before making
+#' any further API requests.
+#'
+#' @return Invisibly returns \code{TRUE} on success.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' opas_logout()
+#' }
+opas_logout <- function() {
+  
+  # Best-effort server-side invalidation: if the token is already expired
+  # or missing, we still clear the local state.
+  if (!is.null(.opas_env$token)) {
+    tryCatch(
+      opas_request("logout"),
+      error = function(e) NULL
+    )
+  }
+  
+  # Clear all authentication state regardless of server response.
+  .opas_env$token         <- NULL
+  .opas_env$refresh_token <- NULL
+  .opas_env$expires_at    <- NULL
+  
+  invisible(TRUE)
+}
