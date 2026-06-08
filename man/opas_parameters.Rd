@@ -12,12 +12,10 @@ Key columns:
 \describe{
 \item{parameter_id}{Unique parameter identifier.}
 \item{parameter_name}{Human-readable parameter name (e.g. \code{"NO2"}).}
-\item{parameter_unit}{Raw measurement unit as provided by the instrument
-(e.g. \code{"ppb"}).}
-\item{conversion_unit}{Target unit after applying the conversion factor
+\item{parameter_unit}{Physical unit after conversion
 (e.g. \code{"µg/m³"}).}
 \item{parameter_conv_curr}{Current conversion factor.  Multiply
-\code{value_raw} from \code{\link{opas_get_series_data_raw}} by this
+\code{value_raw} from \code{\link{opas_get_data}} by this
 value to obtain measurements in \code{parameter_unit}.}
 \item{conversion_history}{List-column with historical conversion
 factors; relevant for long time series spanning unit changes.}

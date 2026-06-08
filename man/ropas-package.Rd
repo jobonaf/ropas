@@ -6,6 +6,8 @@
 \alias{ropas-package}
 \title{ropas: R Client for the OPAS ISPRA Air Quality Web Service}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Provides an R interface to the OPAS (OPen Air System) REST API exposed by ISPRA (Istituto Superiore per la Protezione e la Ricerca Ambientale). Functions cover authentication (JWT login and token refresh), retrieval of the national air quality monitoring network catalogue (stations, parameters, data series), and download of hourly and daily time series measurements with validity codes.
 }
 \author{

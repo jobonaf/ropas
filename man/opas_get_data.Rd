@@ -81,15 +81,13 @@ only the records you trust:
 \code{0} = valid, \code{1} = reconstructed, negative = invalid.
 
 \strong{Note on timestamps}: \code{measure_date_time} strings returned by
-the OPAS API do not carry an explicit timezone offset.  Empirical checks
-indicate the server uses UTC+1 fixed (no daylight saving), consistent
-with the legal reference time required by D.Lgs. 155/2010 and EU
-Directive 2024/2881.  The \code{datetime} column is therefore parsed
-with \code{tz = "Etc/GMT-1"}.
-\emph{This assumption has not been formally confirmed by ISPRA developers
-and may need to be revised.  If the API ever returns strings with an
-explicit offset (e.g. \code{"+01:00"} or \code{"Z"}), this function
-will need to be updated accordingly.}
+the OPAS API carry no explicit timezone offset and always represent
+Italian standard time (UTC+1 fixed, no daylight saving), as confirmed
+by ISPRA developers.  This is consistent with the legal reference time
+required by D.Lgs. 155/2010 and EU Directive 2024/2881.  The
+\code{datetime} column is parsed with \code{tz = "Etc/GMT-1"}.
+For daily aggregates (\code{last_days} or \code{daily = TRUE}), each
+record is timestamped at midnight (\code{00:00:00}) of the reference day.
 }
 \examples{
 \dontrun{
