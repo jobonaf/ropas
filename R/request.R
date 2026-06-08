@@ -88,8 +88,33 @@ opas_request <- function(path, query = NULL) {
   }
   
   # --- Parse response -------------------------------------------------------
+  # The OPAS server (nginx + MojoJS) always returns gzip-compressed bodies
+  # on some endpoints (e.g. series-data-synchro) regardless of the
+  # Accept-Encoding header.  httr2 decompresses automatically only when the
+  # server sends a Content-Encoding header; when that header is absent,
+  # resp_body_json() receives raw compressed bytes and fails.
+  #
+  # Strategy: attempt resp_body_json() first (fast path for most endpoints);
+  # if it fails, fall back to manual decompression with memDecompress().
+  #
   # simplifyVector = FALSE keeps all arrays as R lists, avoiding unexpected
   # coercion of nested structures (e.g. conversion_history, series_data).
   # Callers are responsible for converting to data frames as appropriate.
-  httr2::resp_body_json(resp, simplifyVector = FALSE)
+  tryCatch(
+    httr2::resp_body_json(resp, simplifyVector = FALSE),
+    error = function(e) {
+      raw_bytes <- httr2::resp_body_raw(resp)
+      txt <- tryCatch(
+        rawToChar(memDecompress(raw_bytes, type = "gzip")),
+        error = function(e2) {
+          rlang::abort(paste0(
+            "Failed to parse API response at path '", path, "': ",
+            "not valid JSON and not gzip-compressed.\n",
+            "Original error: ", conditionMessage(e)
+          ), class = "opas_api_error")
+        }
+      )
+      jsonlite::fromJSON(txt, simplifyVector = FALSE)
+    }
+  )
 }
