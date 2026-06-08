@@ -22,15 +22,13 @@
 #' \code{0} = valid, \code{1} = reconstructed, negative = invalid.
 #'
 #' \strong{Note on timestamps}: \code{measure_date_time} strings returned by
-#' the OPAS API do not carry an explicit timezone offset.  Empirical checks
-#' indicate the server uses UTC+1 fixed (no daylight saving), consistent
-#' with the legal reference time required by D.Lgs. 155/2010 and EU
-#' Directive 2024/2881.  The \code{datetime} column is therefore parsed
-#' with \code{tz = "Etc/GMT-1"}.
-#' \emph{This assumption has not been formally confirmed by ISPRA developers
-#' and may need to be revised.  If the API ever returns strings with an
-#' explicit offset (e.g. \code{"+01:00"} or \code{"Z"}), this function
-#' will need to be updated accordingly.}
+#' the OPAS API carry no explicit timezone offset and always represent
+#' Italian standard time (UTC+1 fixed, no daylight saving), as confirmed
+#' by ISPRA developers.  This is consistent with the legal reference time
+#' required by D.Lgs. 155/2010 and EU Directive 2024/2881.  The
+#' \code{datetime} column is parsed with \code{tz = "Etc/GMT-1"}.
+#' For daily aggregates (\code{last_days} or \code{daily = TRUE}), each
+#' record is timestamped at midnight (\code{00:00:00}) of the reference day.
 #'
 #' @param series_id Integer. Series identifier as returned by
 #'   \code{\link{opas_series}} (\code{series_id} column).
@@ -119,9 +117,6 @@ opas_get_data <- function(series_id,
   }
   
   series_id <- as.integer(series_id)
-  if (is.na(series_id)) {
-    rlang::abort("`series_id` must be numeric.")
-  }
   
   # --- Build path -----------------------------------------------------------
   
@@ -133,11 +128,9 @@ opas_get_data <- function(series_id,
     
   } else {
     # Convert start/end to Unix epoch for unambiguous URL construction.
-    # Character strings are interpreted as UTC+1 fixed ("Etc/GMT-1"), which
-    # is the reference timezone used by the OPAS server (see note on
-    # timestamps in the function documentation).
-    # TODO: confirm timezone convention with ISPRA developers; update if
-    # the API begins returning explicit offsets in measure_date_time.
+    # Character strings are interpreted as UTC+1 fixed ("Etc/GMT-1"):
+    # ISPRA confirmed that all OPAS timestamps use Italian standard time
+    # (UTC+1, no daylight saving) with no explicit offset in the strings.
     to_epoch <- function(x) {
       if (inherits(x, "POSIXct")) {
         as.integer(x)
@@ -194,17 +187,12 @@ opas_get_data <- function(series_id,
   
   df <- dplyr::bind_rows(series_data)
   
-  # Parse datetime with UTC+1 fixed timezone, consistent with the OPAS
-  # server convention and the legal reference time for Italian AQ data.
-  # TODO: confirm with ISPRA developers; revisit if explicit offsets appear.
-  df$datetime <- as.POSIXct(
-    df$measure_date_time,
-    format = "%Y-%m-%dT%H:%M:%S",
-    tz     = "Etc/GMT-1"
-  )
-  if (any(is.na(df$datetime))) {
-    rlang::warn("Some timestamps could not be parsed.")
-  }
+  # Parse datetime as UTC+1 fixed (Italian standard time, no DST).
+  # Confirmed by developers: all networks use this convention;
+  # strings never carry an explicit offset.
+  df$datetime <- as.POSIXct(df$measure_date_time,
+                            format = "%Y-%m-%dT%H:%M:%S",
+                            tz     = "Etc/GMT-1")
   
   # value_raw is an alias for measure_value, kept for a cleaner interface.
   # The source column measure_value and the parsed measure_date_time are

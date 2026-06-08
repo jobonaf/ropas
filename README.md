@@ -2,17 +2,11 @@
 
 # ropas
 
-  <!-- badges: start -->
-  [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-  [![R-CMD-check](https://github.com/jobonaf/ropas/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jobonaf/ropas/actions/workflows/R-CMD-check.yaml)
-  <!-- badges: end -->
-
-R client for the [OPAS](https://opas.isprambiente.it) (OPen Air System) REST API.
-
-OPAS is a shared platform used within the Italian National System for
-Environmental Protection (SNPA) for air quality monitoring data management.
-This package provides access to station metadata, time-series catalogues,
-and validated air quality observations available through the public API.
+R client for the [OPAS](https://opas.isprambiente.it) (OPen Air System)
+REST API, maintained by ISPRA (Istituto Superiore per la Protezione e la
+Ricerca Ambientale). Provides access to the Italian national air quality
+monitoring network: station metadata, series catalogues, and hourly/daily
+measurements with validity codes.
 
 ## Installation
 
@@ -34,11 +28,11 @@ serie <- opas_series(region = "06")
 serie[, c("series_id", "station_name", "parameter_name", "parameter_unit")]
 
 # Download the last 24 hours for a series
-dati <- opas_get_data(series_id = 12900, last_hours = 24)
+dati <- opas_get_data(series_id = 12345, last_hours = 24)
 
 # Convert raw values to physical units
 dati$value <- dati$value_raw * serie$parameter_conv_curr[
-  serie$series_id == 12900
+  serie$series_id == 12345
 ]
 
 # Keep only valid data (post_validity_code == 0)
@@ -108,11 +102,16 @@ Example for O3: `parameter_conv_curr = 2` converts ppb → µg/m³.
 
 ## Timestamps
 
-`datetime` is parsed as UTC+1 fixed (`"Etc/GMT-1"`), consistent with the
-legal reference time prescribed by D.Lgs. 155/2010 and EU Directive
-2024/2881 for Italian air quality data. The OPAS server returns timestamps
-without an explicit timezone offset; this interpretation is based on
-empirical checks and has not been formally confirmed by ISPRA developers.
+`datetime` is parsed as UTC+1 fixed (`"Etc/GMT-1"`), corresponding to
+Italian standard time (ora solare) with no daylight saving adjustment.
+This convention applies to all networks and has been confirmed by ISPRA
+developers; timestamp strings never carry an explicit timezone offset.
+
+It is consistent with the legal reference time prescribed by D.Lgs.
+155/2010 and EU Directive 2024/2881 for Italian air quality data.
+
+For daily aggregates (`last_days` or `daily = TRUE`), each record is
+timestamped at midnight (`00:00:00`) of the reference day.
 
 ## Region ISTAT codes
 
