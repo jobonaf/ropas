@@ -11,16 +11,11 @@
 .opas_env$expires_at   <- NULL
 
 
-#' Null-coalescing operator
-#'
-#' Returns \code{x} if it is not \code{NULL}, otherwise \code{y}.
-#' Equivalent to the native \code{\%||\%} introduced in R 4.4; defined here
-#' for compatibility with R >= 4.1.
-#'
-#' @param x,y Any R objects.
-#' @return \code{x} if \code{!is.null(x)}, else \code{y}.
-#'
-#' @keywords internal
+# Null-coalescing operator
+#
+# Returns \code{x} if it is not \code{NULL}, otherwise \code{y}.
+# Equivalent to the native \code{\%||\%} introduced in R 4.4; defined here
+# for compatibility with R >= 4.1.
 `%||%` <- function(x, y) if (!is.null(x)) x else y
 
 
