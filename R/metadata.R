@@ -59,6 +59,75 @@ opas_stations <- function(region = NULL) {
 }
 
 
+#' Get detailed metadata for a single OPAS station
+#'
+#' Retrieves full metadata for one station by ID, including the list of all
+#' parameters (data series) currently or historically measured at that
+#' station.
+#'
+#' @param station_id Integer. Station identifier as returned by the
+#'   \code{station_id} column of \code{\link{opas_stations}}.
+#'
+#' @return A named list with two elements:
+#'   \describe{
+#'     \item{station}{A one-row \code{\link[tibble]{tibble}} with station
+#'       metadata (identifiers, location, classification, network).}
+#'     \item{parameters}{A \code{\link[tibble]{tibble}} with one row per
+#'       parameter measured at the station, including \code{series_id},
+#'       \code{name}, \code{unit}, \code{conversion_factor_curr}, and
+#'       \code{active}.  The \code{conversion_history} column is a
+#'       list-column; \code{date_from}/\code{date_to} values of
+#'       \code{"-infinity"} and \code{"infinity"} are left as-is (they
+#'       cannot be coerced to \code{Date}).}
+#'   }
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' det <- opas_station(1167)
+#' det$station    # one-row tibble with location etc.
+#' det$parameters # all series measured at this station
+#' }
+opas_station <- function(station_id) {
+  
+  path <- paste0("stations/", as.integer(station_id))
+  res  <- opas_request(path)
+  
+  if (is.null(res$station)) {
+    rlang::abort(
+      "Unexpected API response: missing `station` field.",
+      class = "opas_api_error"
+    )
+  }
+  
+  raw <- res$station
+  
+  # Extract the nested parameters list before flattening the station row.
+  params_raw <- raw$parameters
+  raw$parameters <- NULL
+  
+  # Station scalar fields -> one-row tibble.
+  station_tbl <- tibble::as_tibble(raw) |>
+    dplyr::rename(
+      station_id   = id,
+      station_name = name
+    )
+  
+  # Parameters -> one row per series; conversion_history kept as list-column.
+  params_tbl <- if (!is.null(params_raw) && length(params_raw) > 0L) {
+    dplyr::bind_rows(params_raw)
+  } else {
+    tibble::tibble()
+  }
+  
+  list(
+    station    = station_tbl,
+    parameters = params_tbl
+  )
+}
+
+
 #' List OPAS measured parameters
 #'
 #' Retrieves metadata for all parameters measured by OPAS stations,
@@ -69,12 +138,10 @@ opas_stations <- function(region = NULL) {
 #'   \describe{
 #'     \item{parameter_id}{Unique parameter identifier.}
 #'     \item{parameter_name}{Human-readable parameter name (e.g. \code{"NO2"}).}
-#'     \item{parameter_unit}{Raw measurement unit as provided by the instrument
-#'       (e.g. \code{"ppb"}).}
-#'     \item{conversion_unit}{Target unit after applying the conversion factor
+#'     \item{parameter_unit}{Physical unit after conversion
 #'       (e.g. \code{"µg/m³"}).}
 #'     \item{parameter_conv_curr}{Current conversion factor.  Multiply
-#'       \code{value_raw} from \code{\link{opas_get_series_data_raw}} by this
+#'       \code{value_raw} from \code{\link{opas_get_data}} by this
 #'       value to obtain measurements in \code{parameter_unit}.}
 #'     \item{conversion_history}{List-column with historical conversion
 #'       factors; relevant for long time series spanning unit changes.}
@@ -104,8 +171,50 @@ opas_parameters <- function() {
       parameter_id        = id,
       parameter_name      = name,
       parameter_unit      = unit,
-      parameter_conv_curr = conversion_factor_curr,
-      parameter_conv_unit = conversion_unit
+      parameter_conv_curr = conversion_factor_curr
+    )
+}
+
+
+#' Get detailed metadata for a single OPAS parameter
+#'
+#' Retrieves full metadata for one parameter by ID, including unit,
+#' conversion factor, aggregation settings, and conversion history.
+#'
+#' @param parameter_id Integer. Parameter identifier as returned by the
+#'   \code{parameter_id} column of \code{\link{opas_parameters}}.
+#'
+#' @return A one-row \code{\link[tibble]{tibble}} with all parameter fields.
+#'   \code{conversion_history} is a list-column; \code{date_from}/\code{date_to}
+#'   entries of \code{"-infinity"} and \code{"infinity"} are left as
+#'   character strings.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' opas_parameter(7)   # Pressione
+#' opas_parameter(29)  # SO2
+#' }
+opas_parameter <- function(parameter_id) {
+  
+  path <- paste0("parameters/", as.integer(parameter_id))
+  res  <- opas_request(path)
+  
+  if (is.null(res$parameter)) {
+    rlang::abort(
+      "Unexpected API response: missing `parameter` field.",
+      class = "opas_api_error"
+    )
+  }
+  
+  # conversion_history is a list-column; tibble() handles it automatically.
+  tibble::as_tibble(res$parameter) |>
+    dplyr::rename(
+      parameter_id        = id,
+      parameter_name      = name,
+      parameter_unit      = unit,
+      parameter_conv_curr = conversion_factor_curr
     )
 }
 
