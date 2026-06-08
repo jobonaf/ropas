@@ -11,7 +11,7 @@ Description: Provides an R interface to the OPAS (OPen Air System) REST API
     refresh), retrieval of the national air quality monitoring network
     catalogue (stations, parameters, data series), and download of
     hourly and daily time series measurements with validity codes.
-License: GPL (>= 3)
+License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 8.0.0
