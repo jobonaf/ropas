@@ -1,12 +1,46 @@
+#' Parse an OPAS lookup table response
+#'
+#' Internal helper used by lookup/reference-table endpoints.
+#'
+#' @param x List returned by OPAS for a lookup table.
+#' @param field Character scalar. Name of the expected response field.
+#'
+#' @return A \code{\link[tibble]{tibble}}.
+#'
+#' @noRd
+.opas_parse_lookup_table <- function(x, field) {
+  
+  if (is.null(x)) {
+    rlang::abort(
+      paste0("Unexpected API response: missing `", field, "` field."),
+      class = "opas_api_error"
+    )
+  }
+  
+  if (length(x) == 0L) {
+    rlang::warn(paste0(
+      "API returned an empty `", field, "` table."
+    ))
+    return(tibble::tibble())
+  }
+  
+  dplyr::bind_rows(x)
+}
+
+
 #' Get OPAS regulatory limits
 #'
 #' Retrieves the table of regulatory limit definitions used by the OPAS
-#' system.  Each row defines a limit threshold and the maximum number of
+#' system. Each row defines a limit threshold and the maximum number of
 #' allowed exceedances per year for a given pollutant statistic.
 #'
 #' This is a static reference table; it does not contain observed
-#' exceedances.  For observed results against limits, use
+#' exceedances. For observed results against limits, use
 #' \code{\link{opas_get_station_stats}} or \code{\link{opas_get_series_stats}}.
+#'
+#' @param auth Optional object returned by \code{\link{opas_auth}}.
+#'   If supplied, it is used instead of the package-global authentication
+#'   state. Useful for process-based parallel workflows.
 #'
 #' @return A \code{\link[tibble]{tibble}} with one row per limit definition:
 #'   \describe{
@@ -25,19 +59,18 @@
 #' @examples
 #' \dontrun{
 #' opas_limits()
+#'
+#' auth <- opas_auth("user@arpa.fvg.it", "my_password")
+#' opas_limits(auth = auth)
 #' }
-opas_limits <- function() {
+opas_limits <- function(auth = NULL) {
   
-  res <- opas_request("limits")
+  res <- opas_request("limits", auth = auth)
   
-  if (is.null(res$limits)) {
-    rlang::abort(
-      "Unexpected API response: missing `limits` field.",
-      class = "opas_api_error"
-    )
-  }
-  
-  dplyr::bind_rows(res$limits)
+  .opas_parse_lookup_table(
+    x = res$limits,
+    field = "limits"
+  )
 }
 
 
@@ -46,8 +79,12 @@ opas_limits <- function() {
 #' Retrieves the table of statistic types defined in the OPAS system
 #' (e.g. hourly mean, daily mean, annual mean).
 #'
-#' This is a static reference table.  For the mapping between statistics,
+#' This is a static reference table. For the mapping between statistics,
 #' pollutants, and regulatory limits, use \code{\link{opas_statistics_limits}}.
+#'
+#' @param auth Optional object returned by \code{\link{opas_auth}}.
+#'   If supplied, it is used instead of the package-global authentication
+#'   state. Useful for process-based parallel workflows.
 #'
 #' @return A \code{\link[tibble]{tibble}} with one row per statistic type:
 #'   \describe{
@@ -64,19 +101,18 @@ opas_limits <- function() {
 #' @examples
 #' \dontrun{
 #' opas_statistics()
+#'
+#' auth <- opas_auth("user@arpa.fvg.it", "my_password")
+#' opas_statistics(auth = auth)
 #' }
-opas_statistics <- function() {
+opas_statistics <- function(auth = NULL) {
   
-  res <- opas_request("statistics")
+  res <- opas_request("statistics", auth = auth)
   
-  if (is.null(res$statistics)) {
-    rlang::abort(
-      "Unexpected API response: missing `statistics` field.",
-      class = "opas_api_error"
-    )
-  }
-  
-  dplyr::bind_rows(res$statistics)
+  .opas_parse_lookup_table(
+    x = res$statistics,
+    field = "statistics"
+  )
 }
 
 
@@ -84,12 +120,16 @@ opas_statistics <- function() {
 #'
 #' Retrieves the full cross-reference table linking pollutants, statistic
 #' types, and regulatory limits, including the temporal validity of each
-#' limit.  This is the pre-joined version of \code{\link{opas_limits}} and
+#' limit. This is the pre-joined version of \code{\link{opas_limits}} and
 #' \code{\link{opas_statistics}}.
 #'
 #' Useful for understanding which limits apply to a given pollutant and
 #' statistic, and for interpreting the \code{limit_id} column returned by
 #' \code{\link{opas_get_station_stats}} and \code{\link{opas_get_series_stats}}.
+#'
+#' @param auth Optional object returned by \code{\link{opas_auth}}.
+#'   If supplied, it is used instead of the package-global authentication
+#'   state. Useful for process-based parallel workflows.
 #'
 #' @return A \code{\link[tibble]{tibble}} with one row per
 #'   statistic × pollutant × limit combination:
@@ -107,7 +147,7 @@ opas_statistics <- function() {
 #'       limit_exceedances, limit_unit}{Limit definition fields.}
 #'     \item{limit_from, limit_to}{Temporal validity of the limit as
 #'       character strings; \code{"-infinity"} and \code{"infinity"} are
-#'       left as-is (not coercible to \code{Date}).}
+#'       left as-is and are not coerced to \code{Date}.}
 #'   }
 #'
 #' @export
@@ -121,17 +161,16 @@ opas_statistics <- function() {
 #'
 #' # All limits for NO2
 #' sl[sl$pollutant_name == "NO2", ]
+#'
+#' auth <- opas_auth("user@arpa.fvg.it", "my_password")
+#' opas_statistics_limits(auth = auth)
 #' }
-opas_statistics_limits <- function() {
+opas_statistics_limits <- function(auth = NULL) {
   
-  res <- opas_request("statistics-limits")
+  res <- opas_request("statistics-limits", auth = auth)
   
-  if (is.null(res$statistic_limits)) {
-    rlang::abort(
-      "Unexpected API response: missing `statistic_limits` field.",
-      class = "opas_api_error"
-    )
-  }
-  
-  dplyr::bind_rows(res$statistic_limits)
+  .opas_parse_lookup_table(
+    x = res$statistic_limits,
+    field = "statistic_limits"
+  )
 }
