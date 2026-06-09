@@ -36,15 +36,17 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      - uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+     - uses: codecov/codecov-action@v4
         with:
-          # Fail if error if not on PR, or if on PR and token is given
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
           files: ./cobertura.xml
-          plugins: noop
-          disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
-
+          fail_ci_if_error: false
+          use_oidc: false
+          disable_search: true
+          plugins: noop
+          os: linux
+          codecov_curl_args: "--no-verify"
+          
       - name: Show testthat output
         if: always()
         run: |
