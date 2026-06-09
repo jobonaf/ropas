@@ -33,7 +33,7 @@ devtools::install_github("jobonaf/ropas")
 ```r
 library(ropas)
 
-# Authenticate
+# Authenticate for an interactive session
 opas_login("your@email.it", "yourpassword")
 
 # Browse available series for Friuli-Venezia Giulia (ISTAT code "06")
@@ -44,7 +44,8 @@ series[, c(
   "station_name",
   "parameter_name",
   "parameter_unit",
-  "parameter_conv_curr"
+  "parameter_conv_curr",
+  "parameter_conv_unit"
 )]
 
 # Download the last 24 hours for a known series
@@ -53,7 +54,7 @@ data <- opas_get_data(series_id = 12900, last_hours = 24)
 data
 ```
 
-`opas_get_data()` returns raw measurement values as provided by the API. Higher-level helpers for joins, unit conversion and quality filtering will be added in future versions.
+`opas_get_data()` returns raw measurement values as provided by the API. Higher-level helpers for joins, unit conversion and quality filtering may be added in future versions.
 
 ## Authentication
 
@@ -65,13 +66,18 @@ opas_login("your@email.it", "yourpassword")
 
 Authentication state is stored internally for the current R session and is used automatically by API functions.
 
-For advanced or parallel workflows, use an explicit authentication object:
+For advanced or process-based parallel workflows, use an explicit authentication object:
 
 ```r
 auth <- opas_auth("your@email.it", "yourpassword")
 ```
 
-Functions that support an `auth` argument can then receive this object explicitly, avoiding reliance on package-global authentication state in parallel worker processes.
+Functions that support an `auth` argument can then receive this object explicitly, avoiding reliance on package-global authentication state in worker processes:
+
+```r
+series <- opas_series(region = "06", auth = auth)
+data   <- opas_get_data(series_id = 12900, last_hours = 24, auth = auth)
+```
 
 You can retrieve the current internal authentication state with:
 
@@ -83,6 +89,22 @@ Logout clears local authentication state and attempts server-side logout on a be
 
 ```r
 opas_logout()
+```
+
+## Diagnostics
+
+Request-level diagnostic messages can be enabled with:
+
+```r
+options(ropas.verbose = TRUE)
+```
+
+This prints basic request/response information, such as the endpoint path and HTTP status code.
+
+Some OPAS endpoints may return gzip-compressed responses without a usable `Content-Encoding` header. `ropas` applies a fallback manual decompression strategy and warns when this happens. In operational pipelines, these warnings can be disabled with:
+
+```r
+options(ropas.warn_unexpected_gzip = FALSE)
 ```
 
 ## Main functions
@@ -100,36 +122,36 @@ opas_logout()
 
 | Function | Description |
 |---|---|
-| `opas_stations(region = NULL)` | List monitoring stations, optionally filtered by ISTAT region code |
-| `opas_station(station_id)` | Retrieve detailed metadata for a single station |
-| `opas_parameters()` | List measured parameters and conversion metadata |
-| `opas_parameter(parameter_id)` | Retrieve detailed metadata for a single parameter |
-| `opas_parameter_types()` | List OPAS parameter categories |
-| `opas_series(region = NULL, station = NULL)` | List available data series |
+| `opas_stations(region = NULL, auth = NULL)` | List monitoring stations, optionally filtered by ISTAT region code |
+| `opas_station(station_id, auth = NULL)` | Retrieve detailed metadata for a single station |
+| `opas_parameters(auth = NULL)` | List measured parameters and conversion metadata |
+| `opas_parameter(parameter_id, auth = NULL)` | Retrieve detailed metadata for a single parameter |
+| `opas_parameter_types(auth = NULL)` | List OPAS parameter categories |
+| `opas_series(region = NULL, station = NULL, auth = NULL)` | List available data series |
 
 ### Measurements
 
 | Function | Description |
 |---|---|
-| `opas_get_data(series_id, ...)` | Download hourly or daily time series measurements |
+| `opas_get_data(series_id, ..., auth = NULL)` | Download hourly or daily time series measurements |
 
 ### Synchronisation
 
 | Function | Description |
 |---|---|
-| `opas_sync_series(series_id, since)` | Retrieve records inserted or updated after a timestamp for one series |
-| `opas_sync_station(station_id, since)` | Retrieve updated records for all series at one station |
-| `opas_sync_region(region, since)` | Retrieve updated records for all series in a region |
+| `opas_sync_series(series_id, since, auth = NULL)` | Retrieve records inserted or updated after a timestamp for one series |
+| `opas_sync_station(station_id, since, auth = NULL)` | Retrieve updated records for all series at one station |
+| `opas_sync_region(region, since, auth = NULL)` | Retrieve updated records for all series in a region |
 
 ### Statistics and regulatory limits
 
 | Function | Description |
 |---|---|
-| `opas_limits()` | Retrieve regulatory limit definitions |
-| `opas_statistics()` | Retrieve statistic type definitions |
-| `opas_statistics_limits()` | Retrieve statistic-pollutant-limit mappings |
-| `opas_get_station_stats(station_id, year)` | Retrieve annual statistics for a station |
-| `opas_get_series_stats(series_id, year)` | Retrieve annual statistics for a series |
+| `opas_limits(auth = NULL)` | Retrieve regulatory limit definitions |
+| `opas_statistics(auth = NULL)` | Retrieve statistic type definitions |
+| `opas_statistics_limits(auth = NULL)` | Retrieve statistic-pollutant-limit mappings |
+| `opas_get_station_stats(station_id, year, auth = NULL)` | Retrieve annual statistics for a station |
+| `opas_get_series_stats(series_id, year, auth = NULL)` | Retrieve annual statistics for a series |
 
 ## Retrieving data
 
@@ -174,7 +196,13 @@ The original API column `measure_value` is replaced by `value_raw` for a cleaner
 
 ## Units and conversion factors
 
-Measurement endpoints return raw instrument values. Conversion metadata is available from catalogue endpoints such as `opas_series()` and `opas_parameters()`, including the raw unit, current conversion factor and reporting unit. Automatic unit conversion is intentionally left to future higher-level helpers.
+Measurement endpoints return raw instrument values. Conversion metadata is available from catalogue endpoints such as `opas_series()` and `opas_parameters()`:
+
+- `parameter_unit`: raw measurement unit;
+- `parameter_conv_curr`: current conversion factor;
+- `parameter_conv_unit`: reporting unit after conversion.
+
+Automatic unit conversion is intentionally left to future higher-level helpers.
 
 ## Validity codes
 
@@ -280,7 +308,7 @@ links  <- opas_statistics_limits()
 
 ## Region ISTAT codes
 
-The API uses two-digit ISTAT region codes.
+The API uses two-digit ISTAT region codes. Single-digit values such as `6` or `"6"` are accepted and normalised internally to `"06"`.
 
 Common examples:
 
