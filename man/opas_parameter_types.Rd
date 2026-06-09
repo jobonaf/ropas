@@ -4,7 +4,12 @@
 \alias{opas_parameter_types}
 \title{List OPAS parameter types}
 \usage{
-opas_parameter_types()
+opas_parameter_types(auth = NULL)
+}
+\arguments{
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per parameter type,
@@ -12,7 +17,7 @@ containing at minimum a type identifier and a description.
 }
 \description{
 Retrieves the classification of parameters into categories
-(e.g. \emph{Chimici}, \emph{Meteo}).  Useful for filtering the output of
+(e.g. \emph{Chimici}, \emph{Meteo}). Useful for filtering the output of
 \code{\link{opas_parameters}} by category.
 }
 \examples{

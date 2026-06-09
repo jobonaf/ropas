@@ -4,7 +4,7 @@
 \alias{opas_get_series_stats}
 \title{Retrieve OPAS annual statistics for a series}
 \usage{
-opas_get_series_stats(series_id, year)
+opas_get_series_stats(series_id, year, auth = NULL)
 }
 \arguments{
 \item{series_id}{Integer. Series identifier as returned by
@@ -12,10 +12,14 @@ opas_get_series_stats(series_id, year)
 
 \item{year}{Integer or character. Four-digit year (e.g. \code{2025}).
 Must be a completed year.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per statistic × limit
-combination.  See \code{\link{opas_get_station_stats}} for a
+combination. See \code{\link{opas_get_station_stats}} for a
 description of the columns; note that \code{parameter_id} is not
 returned by this endpoint.
 }
@@ -32,5 +36,9 @@ as statistics are computed at year-end.
 \examples{
 \dontrun{
 opas_get_series_stats(series_id = 12900, year = 2025)
+
+# Stateless authentication object
+auth <- opas_auth("user@arpa.fvg.it", "my_password")
+opas_get_series_stats(12900, 2025, auth = auth)
 }
 }

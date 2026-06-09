@@ -4,31 +4,39 @@
 \alias{opas_parameters}
 \title{List OPAS measured parameters}
 \usage{
-opas_parameters()
+opas_parameters(auth = NULL)
+}
+\arguments{
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per parameter.
 Key columns:
 \describe{
 \item{parameter_id}{Unique parameter identifier.}
-\item{parameter_name}{Human-readable parameter name (e.g. \code{"NO2"}).}
-\item{parameter_unit}{Physical unit after conversion
-(e.g. \code{"µg/m³"}).}
-\item{parameter_conv_curr}{Current conversion factor.  Multiply
-\code{value_raw} from \code{\link{opas_get_data}} by this
-value to obtain measurements in \code{parameter_unit}.}
+\item{parameter_name}{Human-readable parameter name, e.g.
+\code{"NO2"}.}
+\item{parameter_unit}{Raw measurement unit used by the instrument,
+e.g. \code{"ppb"}.}
+\item{parameter_conv_curr}{Current conversion factor used to
+transform raw measurements into the reporting unit.}
+\item{parameter_conv_unit}{Reporting unit after applying
+\code{parameter_conv_curr}, e.g. \code{"µg/m³"}.}
 \item{conversion_history}{List-column with historical conversion
-factors; relevant for long time series spanning unit changes.}
+factors; relevant for long time series spanning conversion changes.}
 }
 }
 \description{
 Retrieves metadata for all parameters measured by OPAS stations,
-including physical units, conversion factors, and aggregation settings.
+including raw units, conversion factors, reporting units, and aggregation
+settings.
 }
 \examples{
 \dontrun{
 params <- opas_parameters()
 params[, c("parameter_id", "parameter_name", "parameter_unit",
-           "parameter_conv_curr")]
+           "parameter_conv_curr", "parameter_conv_unit")]
 }
 }

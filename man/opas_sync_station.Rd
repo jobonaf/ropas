@@ -4,7 +4,7 @@
 \alias{opas_sync_station}
 \title{Retrieve updated measurements for all series at a station}
 \usage{
-opas_sync_station(station_id, since)
+opas_sync_station(station_id, since, auth = NULL)
 }
 \arguments{
 \item{station_id}{Integer. Station identifier from
@@ -12,11 +12,15 @@ opas_sync_station(station_id, since)
 
 \item{since}{POSIXct or ISO 8601 character string.  See
 \code{\link{opas_sync_series}} for details.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state.  Useful for process-based parallel workflows.}
 }
 \value{
 A named list of \code{\link[tibble]{tibble}}s, one per series.
-Names are \code{"series_<series_id>"}.  Series with no updates are
-included as empty tibbles.
+Names are usually \code{"series_<series_id>"}.  If a series identifier
+is missing, a stable fallback name is generated.
 }
 \description{
 Downloads all measurements for every series at a given station that
@@ -27,13 +31,11 @@ all parameters measured at the station; series with no updates since
 \details{
 This endpoint can return very large datasets if \code{since} is far in
 the past.  For the first full load of a station, consider using
-\code{\link{opas_get_data}} with an explicit date range
-instead.
+\code{\link{opas_get_data}} with an explicit date range instead.
 }
 \examples{
 \dontrun{
 updates <- opas_sync_station(1167, since = "2026-06-01T00:00:00")
-# Series with actual data
 updates[sapply(updates, nrow) > 0]
 }
 }

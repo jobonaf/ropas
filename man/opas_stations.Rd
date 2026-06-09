@@ -4,21 +4,25 @@
 \alias{opas_stations}
 \title{List OPAS monitoring stations}
 \usage{
-opas_stations(region = NULL)
+opas_stations(region = NULL, auth = NULL)
 }
 \arguments{
-\item{region}{Character. ISTAT region code, zero-padded to two digits.
-Single-digit values are accepted and padded automatically
-(e.g. \code{"6"} -> \code{"06"}).  Valid values: \code{"01"}–\code{"20"}.}
+\item{region}{Character or integer. ISTAT region code. Single-digit
+values are accepted and padded automatically, e.g. \code{6} or
+\code{"6"} become \code{"06"}. Valid values: \code{"01"}–\code{"20"}.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per station.
 The \code{id} and \code{name} fields from the API are renamed to
 \code{station_id} and \code{station_name} for consistency with
-other package functions.
+other package functions when present.
 }
 \description{
-Retrieves metadata for OPAS monitoring stations.  Results can be
+Retrieves metadata for OPAS monitoring stations. Results can be
 optionally filtered by ISTAT region code.
 }
 \details{
@@ -29,6 +33,9 @@ downloaded without filtering.
 \dontrun{
 # All stations in Friuli-Venezia Giulia
 opas_stations(region = "06")
+
+# Equivalent
+opas_stations(region = 6)
 
 # All stations — national catalogue
 opas_stations()

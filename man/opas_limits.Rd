@@ -4,7 +4,12 @@
 \alias{opas_limits}
 \title{Get OPAS regulatory limits}
 \usage{
-opas_limits()
+opas_limits(auth = NULL)
+}
+\arguments{
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per limit definition:
@@ -21,16 +26,19 @@ year; \code{NA} when no exceedance count applies.}
 }
 \description{
 Retrieves the table of regulatory limit definitions used by the OPAS
-system.  Each row defines a limit threshold and the maximum number of
+system. Each row defines a limit threshold and the maximum number of
 allowed exceedances per year for a given pollutant statistic.
 }
 \details{
 This is a static reference table; it does not contain observed
-exceedances.  For observed results against limits, use
+exceedances. For observed results against limits, use
 \code{\link{opas_get_station_stats}} or \code{\link{opas_get_series_stats}}.
 }
 \examples{
 \dontrun{
 opas_limits()
+
+auth <- opas_auth("user@arpa.fvg.it", "my_password")
+opas_limits(auth = auth)
 }
 }

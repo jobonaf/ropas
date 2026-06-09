@@ -10,7 +10,8 @@ opas_get_data(
   end = NULL,
   last_hours = NULL,
   last_days = NULL,
-  daily = FALSE
+  daily = FALSE,
+  auth = NULL
 )
 }
 \arguments{
@@ -19,10 +20,10 @@ opas_get_data(
 
 \item{start, end}{Start and end of the requested period.  Accepted inputs:
 \itemize{
-\item A \code{POSIXct} object (any timezone; converted to UTC+1
-internally).
+\item A \code{POSIXct} object.
 \item A character string in ISO 8601 format
-\code{"YYYY-MM-DDTHH:MM:SS"}, interpreted as UTC+1.
+\code{"YYYY-MM-DDTHH:MM:SS"}, interpreted as UTC+1 fixed
+(\code{"Etc/GMT-1"}).
 }
 Both must be supplied together.}
 
@@ -38,6 +39,10 @@ set \code{TRUE} to use the daily-aggregated endpoint
 (\code{/series-data-dd/}) instead of the raw hourly one
 (\code{/series-data/}).  Ignored when \code{last_hours} or
 \code{last_days} is supplied.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. This is useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per measurement,
@@ -46,12 +51,14 @@ including:
 \item{datetime}{\code{POSIXct} in UTC+1 fixed (\code{"Etc/GMT-1"}),
 derived from \code{measure_date_time}.  See the note on timestamps
 in the Details section.}
-\item{value_raw}{\code{measure_value} as returned by the API (not
-converted); the source column \code{measure_value} is dropped.}
-\item{post_validity_code}{Primary validity flag (0 = valid,
-1 = reconstructed, negative = invalid).}
+\item{value_raw}{\code{measure_value} as returned by the API; the
+source column \code{measure_value} is dropped.}
+\item{post_validity_code}{Primary validity flag when provided by the
+API (0 = valid, 1 = reconstructed, negative = invalid).}
 \item{series_id, station_id, station_name, parameter_name,
-parameter_unit}{Series context columns, prepended for convenience.}
+parameter_unit}{Series context columns, prepended for convenience.
+\code{parameter_unit} is the raw measurement unit returned by the
+data endpoint.}
 \item{...}{All remaining API fields except \code{measure_value} and
 \code{measure_date_time}, which are replaced by \code{value_raw}
 and \code{datetime} respectively.}
@@ -72,9 +79,10 @@ of the raw hourly one.
 }
 
 \strong{Note on \code{measure_value}}: the API returns raw instrument
-values.  To convert to the physical unit reported in
-\code{parameter_unit}, multiply by \code{parameter_conv_curr} (available
-from \code{\link{opas_series}}).
+values.  This function exposes them as \code{value_raw}.  Conversion
+metadata is available from catalogue endpoints such as
+\code{\link{opas_series}} and \code{\link{opas_parameters}}.  Automatic
+conversion is intentionally left to higher-level helper functions.
 
 \strong{Note on validity}: filter on \code{post_validity_code} to keep
 only the records you trust:
@@ -92,20 +100,24 @@ record is timestamped at midnight (\code{00:00:00}) of the reference day.
 \examples{
 \dontrun{
 # Last 24 hours
-opas_get_data(12345, last_hours = 24)
+opas_get_data(12900, last_hours = 24)
 
 # Last 7 daily aggregates
-opas_get_data(12345, last_days = 7)
+opas_get_data(12900, last_days = 7)
 
 # Custom range (raw hourly)
-opas_get_data(12345,
+opas_get_data(12900,
               start = "2026-01-01T00:00:00",
               end   = "2026-02-01T00:00:00")
 
 # Custom range (daily aggregates)
-opas_get_data(12345,
+opas_get_data(12900,
               start = "2026-01-01T00:00:00",
               end   = "2026-02-01T00:00:00",
               daily = TRUE)
+
+# Stateless authentication object, useful in parallel workflows
+auth <- opas_auth("user@arpa.fvg.it", "my_password")
+opas_get_data(12900, last_hours = 24, auth = auth)
 }
 }

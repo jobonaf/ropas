@@ -4,14 +4,19 @@
 \alias{opas_sync_series}
 \title{Retrieve updated measurements for a single series}
 \usage{
-opas_sync_series(series_id, since)
+opas_sync_series(series_id, since, auth = NULL)
 }
 \arguments{
 \item{series_id}{Integer. Series identifier from \code{\link{opas_series}}.}
 
-\item{since}{POSIXct or ISO 8601 character string (\code{"YYYY-MM-DDTHH:MM:SS"}).
-Only records inserted or updated after this timestamp are returned.
-Interpreted as Italian standard time (UTC+1 fixed).}
+\item{since}{POSIXct or ISO 8601 character string
+(\code{"YYYY-MM-DDTHH:MM:SS"}).  Only records inserted or updated after
+this timestamp are returned.  Character input is interpreted as Italian
+standard time (UTC+1 fixed).}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state.  Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per updated
@@ -48,10 +53,9 @@ Use \code{\link{opas_series}} to reconcile the two identifiers.
 # Records updated since 1 June 2026
 opas_sync_series(12900, since = "2026-06-01T00:00:00")
 
-# Incremental sync pattern
-last_sync <- as.POSIXct("2026-06-01T00:00:00", tz = "Etc/GMT-1")
-new_data  <- opas_sync_series(12900, since = last_sync)
-if (nrow(new_data) > 0) last_sync <- max(new_data$measure_update_ts)
+# Stateless authentication object
+auth <- opas_auth("user@arpa.fvg.it", "my_password")
+opas_sync_series(12900, since = "2026-06-01T00:00:00", auth = auth)
 }
 
 }

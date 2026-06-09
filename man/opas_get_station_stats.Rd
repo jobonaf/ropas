@@ -4,7 +4,7 @@
 \alias{opas_get_station_stats}
 \title{Retrieve OPAS annual statistics for a station}
 \usage{
-opas_get_station_stats(station_id, year)
+opas_get_station_stats(station_id, year, auth = NULL)
 }
 \arguments{
 \item{station_id}{Integer. Station identifier as returned by
@@ -12,6 +12,10 @@ opas_get_station_stats(station_id, year)
 
 \item{year}{Integer or character. Four-digit year (e.g. \code{2025}).
 Must be a completed year.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per
@@ -24,7 +28,8 @@ identifier and aggregation type (\code{"Y"}).}
 \item{limit_id, limit_description, limit_threshold,
 limit_exceedances}{Regulatory limit details; \code{NA} when no
 limit is defined for the statistic.}
-\item{result_from, result_to}{Coverage period as \code{Date} objects.}
+\item{result_from, result_to}{Coverage period as \code{Date} objects,
+when returned by the API.}
 \item{result_value}{Computed statistic value.}
 \item{result_exceedance}{Logical; \code{TRUE} if the limit threshold
 was exceeded.}
@@ -34,7 +39,7 @@ were available to compute the statistic.}
 }
 \description{
 Downloads pre-computed annual statistics for all parameters measured at
-a given station.  Statistics include regulatory limit comparisons
+a given station. Statistics include regulatory limit comparisons
 (threshold, exceedances, compliance) where applicable.
 }
 \details{
@@ -42,7 +47,7 @@ Only complete years are available; the current year returns no results
 as statistics are computed at year-end.
 
 Daily (\code{D}) and monthly (\code{M}) aggregation types exist in the
-API schema but return no data in the current OPAS deployment.  This
+API schema but return no data in the current OPAS deployment. This
 function therefore only supports annual (\code{Y}) statistics.
 }
 \examples{
@@ -53,5 +58,9 @@ opas_get_station_stats(station_id = 1167, year = 2025)
 # Keep only results with a defined regulatory limit
 stats <- opas_get_station_stats(1167, 2025)
 stats[!is.na(stats$limit_id), ]
+
+# Stateless authentication object
+auth <- opas_auth("user@arpa.fvg.it", "my_password")
+opas_get_station_stats(1167, 2025, auth = auth)
 }
 }

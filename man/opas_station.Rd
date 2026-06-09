@@ -4,24 +4,26 @@
 \alias{opas_station}
 \title{Get detailed metadata for a single OPAS station}
 \usage{
-opas_station(station_id)
+opas_station(station_id, auth = NULL)
 }
 \arguments{
 \item{station_id}{Integer. Station identifier as returned by the
 \code{station_id} column of \code{\link{opas_stations}}.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A named list with two elements:
 \describe{
 \item{station}{A one-row \code{\link[tibble]{tibble}} with station
-metadata (identifiers, location, classification, network).}
+metadata.}
 \item{parameters}{A \code{\link[tibble]{tibble}} with one row per
-parameter measured at the station, including \code{series_id},
-\code{name}, \code{unit}, \code{conversion_factor_curr}, and
-\code{active}.  The \code{conversion_history} column is a
-list-column; \code{date_from}/\code{date_to} values of
-\code{"-infinity"} and \code{"infinity"} are left as-is (they
-cannot be coerced to \code{Date}).}
+parameter measured at the station. When present, fields are renamed
+consistently to \code{parameter_name}, \code{parameter_unit},
+\code{parameter_conv_curr}, and \code{parameter_conv_unit}.
+The \code{conversion_history} column is preserved as a list-column.}
 }
 }
 \description{
@@ -32,7 +34,7 @@ station.
 \examples{
 \dontrun{
 det <- opas_station(1167)
-det$station    # one-row tibble with location etc.
-det$parameters # all series measured at this station
+det$station
+det$parameters
 }
 }

@@ -4,7 +4,12 @@
 \alias{opas_statistics}
 \title{Get OPAS statistic types}
 \usage{
-opas_statistics()
+opas_statistics(auth = NULL)
+}
+\arguments{
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per statistic type:
@@ -22,11 +27,14 @@ Retrieves the table of statistic types defined in the OPAS system
 (e.g. hourly mean, daily mean, annual mean).
 }
 \details{
-This is a static reference table.  For the mapping between statistics,
+This is a static reference table. For the mapping between statistics,
 pollutants, and regulatory limits, use \code{\link{opas_statistics_limits}}.
 }
 \examples{
 \dontrun{
 opas_statistics()
+
+auth <- opas_auth("user@arpa.fvg.it", "my_password")
+opas_statistics(auth = auth)
 }
 }

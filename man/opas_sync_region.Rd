@@ -4,7 +4,7 @@
 \alias{opas_sync_region}
 \title{Retrieve updated measurements for all series in a region}
 \usage{
-opas_sync_region(region, since)
+opas_sync_region(region, since, auth = NULL)
 }
 \arguments{
 \item{region}{Character. ISTAT region code (e.g. \code{"06"}).
@@ -12,11 +12,16 @@ Zero-padded automatically if needed.}
 
 \item{since}{POSIXct or ISO 8601 character string.  See
 \code{\link{opas_sync_series}} for details.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state.  Useful for process-based parallel workflows.}
 }
 \value{
-A named list of \code{\link[tibble]{tibble}}s, one per series,
-named \code{"series_<series_id>"}. Series with no updates are included
-as empty tibbles.
+A named list of \code{\link[tibble]{tibble}}s, one per
+station-series pair.  Names use the form
+\code{"station_<station_id>_series_<series_id>"} when identifiers are
+available.  Missing identifiers receive stable fallback names.
 }
 \description{
 Downloads all measurements for every series in a given region that
@@ -30,10 +35,8 @@ incremental synchronisation.  For historical backfills, prefer
 }
 \examples{
 \dontrun{
-# Incremental sync for FVG - last 24 hours
 since   <- as.POSIXct(Sys.time() - 86400, tz = "Etc/GMT-1")
 updates <- opas_sync_region("06", since = since)
-# Bind non-empty results into a single tibble
 dplyr::bind_rows(updates[sapply(updates, nrow) > 0])
 }
 }

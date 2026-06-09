@@ -4,49 +4,61 @@
 \alias{opas_series}
 \title{List available OPAS data series}
 \usage{
-opas_series(region = NULL, station = NULL)
+opas_series(region = NULL, station = NULL, auth = NULL)
 }
 \arguments{
-\item{region}{Character. ISTAT region code, zero-padded to two digits
-(e.g. \code{"06"} for Friuli-Venezia Giulia).  Valid values:
-\code{"01"}–\code{"20"}.}
+\item{region}{Character or integer. ISTAT region code. Single-digit
+values are accepted and padded automatically, e.g. \code{6} or
+\code{"6"} become \code{"06"}. Valid values: \code{"01"}–\code{"20"}.}
 
 \item{station}{Integer or character. Station ID as returned by the
-\code{id} field of \code{/stations}.}
+\code{station_id} column of \code{\link{opas_stations}}.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
-A \code{\link[tibble]{tibble}} with one row per series and the
-following key columns:
+A \code{\link[tibble]{tibble}} with one row per series.
+Key columns include:
 \describe{
 \item{series_id}{Unique series identifier; use this with
 \code{\link{opas_get_data}}.}
 \item{station_id, station_name}{Station identifiers.}
-\item{parameter_id, parameter_name, parameter_unit}{Parameter
-identifiers and physical unit.}
-\item{parameter_conv_curr}{Current conversion factor; raw
-\code{measure_value} from \code{/series-data} must be multiplied
-by this to obtain values in \code{parameter_unit}.}
+\item{parameter_id, parameter_name}{Parameter identifiers.}
+\item{parameter_unit}{Raw measurement unit, e.g. \code{"ppb"}.}
+\item{parameter_conv_curr}{Current conversion factor used to
+transform raw measurements into the reporting unit.}
+\item{parameter_conv_unit}{Reporting unit after applying
+\code{parameter_conv_curr}, e.g. \code{"µg/m³"}.}
 \item{region_istat_code, region_name}{Region identifiers.}
 }
 }
 \description{
-Retrieves the catalogue of data series from the OPAS API.  Each series
+Retrieves the catalogue of data series from the OPAS API. Each series
 corresponds to one parameter measured at one station, and carries the
-\code{series_id} needed to download actual measurements via
+\code{series_id} needed to download measurements via
 \code{\link{opas_get_data}}.
 }
 \details{
 Exactly one of \code{region} or \code{station} should normally be
-supplied.  Calling the function with no arguments fetches the full
-national catalogue, which is a very large object; a confirmation prompt
-is shown in interactive sessions.
+supplied. Calling the function with no arguments fetches the full
+catalogue, which can be a large object; a confirmation prompt is shown
+in interactive sessions.
 }
 \examples{
 \dontrun{
 # All series for Friuli-Venezia Giulia
 opas_series(region = "06")
 
+# Equivalent
+opas_series(region = 6)
+
 # All series for a specific station
 opas_series(station = 1167)
+
+# Stateless authentication object
+auth <- opas_auth("user@arpa.fvg.it", "my_password")
+opas_series(region = "06", auth = auth)
 }
 }

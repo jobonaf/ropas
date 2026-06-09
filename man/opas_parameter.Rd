@@ -4,21 +4,26 @@
 \alias{opas_parameter}
 \title{Get detailed metadata for a single OPAS parameter}
 \usage{
-opas_parameter(parameter_id)
+opas_parameter(parameter_id, auth = NULL)
 }
 \arguments{
 \item{parameter_id}{Integer. Parameter identifier as returned by the
 \code{parameter_id} column of \code{\link{opas_parameters}}.}
+
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A one-row \code{\link[tibble]{tibble}} with all parameter fields.
-\code{conversion_history} is a list-column; \code{date_from}/\code{date_to}
-entries of \code{"-infinity"} and \code{"infinity"} are left as
-character strings.
+\code{conversion_history} is preserved as a list-column;
+\code{date_from}/\code{date_to} entries of \code{"-infinity"} and
+\code{"infinity"} are left as character strings.
 }
 \description{
-Retrieves full metadata for one parameter by ID, including unit,
-conversion factor, aggregation settings, and conversion history.
+Retrieves full metadata for one parameter by ID, including raw unit,
+conversion factor, reporting unit, aggregation settings, and conversion
+history.
 }
 \examples{
 \dontrun{

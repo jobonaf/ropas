@@ -7,13 +7,20 @@
 opas_logout()
 }
 \value{
-Invisibly returns \code{TRUE} on success.
+Invisibly returns \code{TRUE}.
 }
 \description{
 Invalidates the current session on the server and clears all
-authentication state from the internal environment.  After calling this
-function, \code{\link{opas_login}} must be called again before making
-any further API requests.
+authentication state from the internal environment.
+}
+\details{
+Server-side logout is attempted on a best-effort basis. Local
+authentication state is cleared regardless of whether the server-side
+logout request succeeds.
+
+After calling this function, \code{\link{opas_login}} must be called again
+before making API requests through the default interactive authentication
+workflow.
 }
 \examples{
 \dontrun{

@@ -4,7 +4,12 @@
 \alias{opas_statistics_limits}
 \title{Get OPAS statistic-pollutant-limit combinations}
 \usage{
-opas_statistics_limits()
+opas_statistics_limits(auth = NULL)
+}
+\arguments{
+\item{auth}{Optional object returned by \code{\link{opas_auth}}.
+If supplied, it is used instead of the package-global authentication
+state. Useful for process-based parallel workflows.}
 }
 \value{
 A \code{\link[tibble]{tibble}} with one row per
@@ -23,13 +28,13 @@ Statistic type fields.}
 limit_exceedances, limit_unit}{Limit definition fields.}
 \item{limit_from, limit_to}{Temporal validity of the limit as
 character strings; \code{"-infinity"} and \code{"infinity"} are
-left as-is (not coercible to \code{Date}).}
+left as-is and are not coerced to \code{Date}.}
 }
 }
 \description{
 Retrieves the full cross-reference table linking pollutants, statistic
 types, and regulatory limits, including the temporal validity of each
-limit.  This is the pre-joined version of \code{\link{opas_limits}} and
+limit. This is the pre-joined version of \code{\link{opas_limits}} and
 \code{\link{opas_statistics}}.
 }
 \details{
@@ -46,5 +51,8 @@ sl[sl$stat_poll_type == "Y", ]
 
 # All limits for NO2
 sl[sl$pollutant_name == "NO2", ]
+
+auth <- opas_auth("user@arpa.fvg.it", "my_password")
+opas_statistics_limits(auth = auth)
 }
 }

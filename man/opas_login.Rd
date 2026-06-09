@@ -16,9 +16,16 @@ Invisibly returns \code{TRUE} on success.
 }
 \description{
 Authenticates with the OPAS web service and stores the JWT access token
-and refresh token internally.  Must be called before any other API
-function.  The token is valid for approximately 1 hour; subsequent calls
-are handled automatically by \code{opas_ensure_token()}.
+and refresh token internally. Must be called before any other API
+function when using the default interactive authentication workflow.
+}
+\details{
+The token is valid for approximately 1 hour; subsequent calls are handled
+automatically by \code{opas_ensure_token()}.
+
+For parallel workflows, prefer \code{\link{opas_auth}} and pass the
+returned object explicitly to API functions that support an \code{auth}
+argument.
 }
 \examples{
 \dontrun{
