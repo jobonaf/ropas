@@ -5,3 +5,6 @@
 ^tests/testthat/contract$
 ^docs/semantica-api-opas[.]md$
 ^dev$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

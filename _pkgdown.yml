@@ -1,0 +1,58 @@
+url: https://jobonaf.github.io/ropas/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [github]
+
+reference:
+  - title: "Authentication"
+    desc: "Login, explicit authentication objects, and session management."
+    contents:
+      - opas_login
+      - opas_auth
+      - opas_current_auth
+      - opas_logout
+
+  - title: "Metadata"
+    desc: "Stations, sites, campaigns, parameters, and series catalogues."
+    contents:
+      - opas_stations
+      - opas_station
+      - opas_sites
+      - opas_campaigns
+      - opas_station_parameters
+      - opas_parameters
+      - opas_parameter
+      - opas_parameter_types
+      - opas_series
+
+  - title: "Measurements"
+    desc: "Hourly and daily measurement data."
+    contents:
+      - opas_get_data
+      
+  - title: "Station logs"
+    desc: "Station log events over date-time ranges."
+    contents:
+      - opas_station_log
+
+  - title: "Incremental synchronisation"
+    desc: "Endpoints for retrieving inserted or updated measurements."
+    contents:
+      - opas_sync_series
+      - opas_sync_station
+      - opas_sync_region
+
+  - title: "Statistics and regulatory limits"
+    desc: "Annual statistics and lookup tables for regulatory limits."
+    contents:
+      - opas_get_station_stats
+      - opas_get_series_stats
+      - opas_limits
+      - opas_statistics
+      - opas_statistics_limits
