@@ -51,3 +51,22 @@ test_that(".opas_one_row_tibble preserves nested fields as list-columns", {
   expect_true(is.list(out$nested))
   expect_true(is.list(out$empty))
 })
+
+test_that(".opas_datetime_to_iso parses POSIXct and ISO strings", {
+  x <- as.POSIXct("2026-06-01 00:00:00", tz = "Etc/GMT-1")
+  
+  expect_equal(
+    .opas_datetime_to_iso(x, arg = "at"),
+    "2026-06-01T00:00:00"
+  )
+  
+  expect_equal(
+    .opas_datetime_to_iso("2026-06-01T00:00:00", arg = "at"),
+    "2026-06-01T00:00:00"
+  )
+  
+  expect_error(
+    .opas_datetime_to_iso("not-a-date", arg = "at"),
+    "`at` must be a POSIXct or ISO 8601 string"
+  )
+})

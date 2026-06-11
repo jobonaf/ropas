@@ -233,3 +233,55 @@ test_that("opas_request validates path and query before auth/request", {
     "`query` must be a fully named list"
   )
 })
+
+test_that("new metadata endpoints validate input before request", {
+  expect_error(
+    opas_campaigns("abc"),
+    "`station_id` must be numeric"
+  )
+  
+  expect_error(
+    opas_campaigns(1167, at = "not-a-date"),
+    "`at` must be a POSIXct or ISO 8601 string"
+  )
+  
+  expect_error(
+    opas_station_parameters("abc", 34),
+    "`station_id` must be numeric"
+  )
+  
+  expect_error(
+    opas_station_parameters(1167, "abc"),
+    "`parameter_id` must be numeric"
+  )
+})
+
+
+test_that("opas_station_log validates input before request", {
+  expect_error(
+    opas_station_log(
+      station_id = "abc",
+      start = "2026-01-01T00:00:00",
+      end   = "2026-02-01T00:00:00"
+    ),
+    "`station_id` must be numeric"
+  )
+  
+  expect_error(
+    opas_station_log(
+      station_id = 1167,
+      start = "not-a-date",
+      end   = "2026-02-01T00:00:00"
+    ),
+    "`start` must be a POSIXct or ISO 8601 string"
+  )
+  
+  expect_error(
+    opas_station_log(
+      station_id = 1167,
+      start = "2026-02-01T00:00:00",
+      end   = "2026-01-01T00:00:00"
+    ),
+    "`start` must be earlier than `end`"
+  )
+})
