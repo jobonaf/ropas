@@ -431,7 +431,7 @@ opas_request <- function(path,
         "OPAS API error [HTTP ", status, "] at path '", path, "': ", detail
       ),
       class = "opas_api_error",
-      body = body,
+      response_body = body,
       path = path,
       status = status
     )
