@@ -1,6 +1,6 @@
 Package: ropas
-Title: R Client for the OPAS ISPRA Air Quality Web Service
-Version: 0.0.0.9000
+Title: R Client for OPAS Environmental Monitoring Web Services
+Version: 0.1.0
 Authors@R:
     person("Giovanni", "Bonafe", , "giovanni.bonafe@arpa.fvg.it",
            role = c("aut", "cre"),

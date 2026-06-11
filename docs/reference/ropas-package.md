@@ -1,4 +1,4 @@
-# ropas: R Client for the OPAS ISPRA Air Quality Web Service
+# ropas: R Client for OPAS Environmental Monitoring Web Services
 
 Provides an R interface to the OPAS (OPen Air System) REST API exposed
 by ISPRA (Istituto Superiore per la Protezione e la Ricerca Ambientale).

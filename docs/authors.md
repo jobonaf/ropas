@@ -7,12 +7,12 @@
 
 ## Citation
 
-Bonafe G (2026). *ropas: R Client for the OPAS ISPRA Air Quality Web
-Service*. R package version 0.0.0.9000.
+Bonafe G (2026). *ropas: R Client for OPAS Environmental Monitoring Web
+Services*. R package version 0.1.0.
 
     @Manual{,
-      title = {ropas: R Client for the OPAS ISPRA Air Quality Web Service},
+      title = {ropas: R Client for OPAS Environmental Monitoring Web Services},
       author = {Giovanni Bonafe},
       year = {2026},
-      note = {R package version 0.0.0.9000},
+      note = {R package version 0.1.0},
     }

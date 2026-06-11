@@ -9,7 +9,7 @@ supplied, only campaigns active at that date-time are returned."><meta property=
 
     <a class="navbar-brand me-2" href="../index.html">ropas</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,6 +18,7 @@ supplied, only campaigns active at that date-time are returned."><meta property=
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"></ul></div>
 
 
@@ -71,8 +72,15 @@ or an empty tibble if no campaigns are available for the query.
 Key columns:</p><dl><dt>station_id, station_name</dt>
 <dd><p>Station identifiers.</p></dd>
 
+<dt>station_override_id, station_external_id</dt>
+<dd><p>Additional station
+identifiers returned by the API.</p></dd>
+
 <dt>site_id, site_name</dt>
 <dd><p>Site identifiers.</p></dd>
+
+<dt>site_locality</dt>
+<dd><p>Site locality.</p></dd>
 
 <dt>site_wgs84_lat, site_wgs84_lon</dt>
 <dd><p>Site coordinates.</p></dd>
@@ -81,11 +89,13 @@ Key columns:</p><dl><dt>station_id, station_name</dt>
 <dd><p>Allocation period as <code>POSIXct</code> in UTC+1 fixed
 (<code>"Etc/GMT-1"</code>), when returned by the API.</p></dd>
 
-<dt>campaign_id, campaign_name</dt>
-<dd><p>Campaign identifiers.</p></dd>
-
 <dt>network_names</dt>
 <dd><p>List-column with network names.</p></dd>
+
+<dt>...</dt>
+<dd><p>Additional allocation or campaign fields returned by the
+API, such as <code>campaign_id</code> and <code>campaign_name</code> when
+available.</p></dd>
 
 
 </dl></div>

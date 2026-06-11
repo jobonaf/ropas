@@ -4,7 +4,7 @@
 \name{ropas-package}
 \alias{ropas}
 \alias{ropas-package}
-\title{ropas: R Client for the OPAS ISPRA Air Quality Web Service}
+\title{ropas: R Client for OPAS Environmental Monitoring Web Services}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 

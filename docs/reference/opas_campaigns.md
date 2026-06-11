@@ -40,9 +40,17 @@ campaigns are available for the query. Key columns:
     
     Station identifiers.
 
+  - station\_override\_id, station\_external\_id:
+    
+    Additional station identifiers returned by the API.
+
   - site\_id, site\_name:
     
     Site identifiers.
+
+  - site\_locality:
+    
+    Site locality.
 
   - site\_wgs84\_lat, site\_wgs84\_lon:
     
@@ -53,13 +61,14 @@ campaigns are available for the query. Key columns:
     Allocation period as `POSIXct` in UTC+1 fixed (`"Etc/GMT-1"`), when
     returned by the API.
 
-  - campaign\_id, campaign\_name:
-    
-    Campaign identifiers.
-
   - network\_names:
     
     List-column with network names.
+
+  - ...:
+    
+    Additional allocation or campaign fields returned by the API, such
+    as `campaign_id` and `campaign_name` when available.
 
 ## Examples
 

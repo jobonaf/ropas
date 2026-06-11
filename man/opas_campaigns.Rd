@@ -29,13 +29,18 @@ or an empty tibble if no campaigns are available for the query.
 Key columns:
 \describe{
 \item{station_id, station_name}{Station identifiers.}
+\item{station_override_id, station_external_id}{Additional station
+identifiers returned by the API.}
 \item{site_id, site_name}{Site identifiers.}
+\item{site_locality}{Site locality.}
 \item{site_wgs84_lat, site_wgs84_lon}{Site coordinates.}
 \item{allocation_startup_date, allocation_dismiss_date}{
 Allocation period as \code{POSIXct} in UTC+1 fixed
 (\code{"Etc/GMT-1"}), when returned by the API.}
-\item{campaign_id, campaign_name}{Campaign identifiers.}
 \item{network_names}{List-column with network names.}
+\item{...}{Additional allocation or campaign fields returned by the
+API, such as \code{campaign_id} and \code{campaign_name} when
+available.}
 }
 }
 \description{
