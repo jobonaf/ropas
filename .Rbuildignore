@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^\.github$
 ^codecov\.yml$
+^tests/testthat/contract$
+^docs/semantica-api-opas[.]md$
+^dev$
