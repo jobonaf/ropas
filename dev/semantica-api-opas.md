@@ -9,21 +9,21 @@ Questo documento serve a rendere esplicite le assunzioni usate nello sviluppo di
 
 In particolare distingue tra:
 
-- quanto dichiarato nella specifica OpenAPI;
-- quanto osservato interrogando gli endpoint reali;
-- quanto confermato dagli sviluppatori OPAS;
-- le decisioni implementative adottate nel client R `ropas`.
+* quanto dichiarato nella specifica OpenAPI;
+* quanto osservato interrogando gli endpoint reali;
+* quanto confermato dagli sviluppatori OPAS;
+* le decisioni implementative adottate nel client R `ropas`.
 
-Il documento non sostituisce la documentazione ufficiale delle API, ma raccoglie note operative utili per interpretare correttamente campi, codici, identificativi, timestamp e fattori di conversione.
+Il documento non sostituisce la documentazione ufficiale delle API, ma raccoglie note operative utili per interpretare correttamente campi, codici, identificativi, timestamp, cadenze temporali e fattori di conversione.
 
 ## Fonti delle informazioni
 
 Le informazioni riportate possono provenire da fonti diverse. Quando possibile, ogni nota dovrebbe indicare una o più delle seguenti origini:
 
-- **OpenAPI**: informazione ricavata da `openapi.yaml`.
-- **Osservato**: comportamento verificato interrogando gli endpoint reali.
-- **Chiarimento sviluppatori**: informazione ricevuta dagli sviluppatori o gestori OPAS.
-- **Decisione `ropas`**: scelta implementativa adottata nel client R.
+* **OpenAPI**: informazione ricavata da `openapi.yaml`.
+* **Osservato**: comportamento verificato interrogando gli endpoint reali.
+* **Chiarimento sviluppatori**: informazione ricevuta dagli sviluppatori o gestori OPAS.
+* **Decisione `ropas`**: scelta implementativa adottata nel client R.
 
 Esempio di annotazione:
 
@@ -36,31 +36,31 @@ Fonte: Decisione ropas
 
 ## Inventario sintetico degli endpoint coperti
 
-| Endpoint | Funzione `ropas` | Stato | Note |
-|---|---|---|---|
-| `/login` | `opas_auth()`, `opas_login()` | implementato | Autenticazione. |
-| `/refresh-token` | `opas_refresh()` | implementato | Uso interno per refresh token. |
-| `/logout` | `opas_logout()` | implementato | Best effort; pulizia stato locale sempre effettuata. |
-| `/stations` | `opas_stations()` | implementato | Catalogo stazioni. |
-| `/stations/{region}` | `opas_stations(region = ...)` | implementato | `region` normalizzato a due cifre. |
-| `/stations/{station_id}` | `opas_station()` | implementato | Dettaglio stazione + parametri. |
-| `/stations-parameters/{station_id}/{parameter_id}` | `opas_station_parameters()` | implementato | Dettaglio stazione filtrato per parametro. |
-| `/sites` | `opas_sites()` | implementato | Siti fisici; `network_names` come list-column. |
-| `/campaigns/{station_id}` | `opas_campaigns()` | implementato | Può restituire `allocations = null`. |
-| `/campaigns/{station_id}/{date_time}` | `opas_campaigns(at = ...)` | implementato | `date_time` in formato ISO 8601. |
-| `/series/{region}` | `opas_series(region = ...)` | implementato | Catalogo serie per regione. |
-| `/series/{station_id}` | `opas_series(station = ...)` | implementato | Catalogo serie per stazione. |
-| `/series-data/...` | `opas_get_data()` | implementato | Dati raw orari. |
-| `/series-data-dd/...` | `opas_get_data(daily = TRUE)` / `last_days` | implementato | Aggregati giornalieri. |
-| `/series-data-synchro/...` | `opas_sync_series()` | implementato | Sincronizzazione incrementale singola serie. |
-| `/series-data-synchro-all/{station_id}/...` | `opas_sync_station()` | implementato | Sincronizzazione incrementale per stazione. |
-| `/series-data-synchro-all/{region}/...` | `opas_sync_region()` | implementato | Sincronizzazione incrementale per regione. |
-| `/statistics-station-data/Y/...` | `opas_get_station_stats()` | implementato | Statistiche annuali per stazione. |
-| `/statistics-series-data/Y/...` | `opas_get_series_stats()` | implementato | Statistiche annuali per serie. |
-| `/limits` | `opas_limits()` | implementato | Tabella limiti normativi. |
-| `/statistics` | `opas_statistics()` | implementato | Tipi statistici. |
-| `/statistics-limits` | `opas_statistics_limits()` | implementato | Relazioni statistica-inquinante-limite. |
-| `/stations-log/{station_id}/{start}/{end}` | `opas_station_log()` | implementato | Verificato con timestamp ISO 8601 nel path. |
+| Endpoint                                           | Funzione `ropas`                            | Stato        | Note                                                 |
+| -------------------------------------------------- | ------------------------------------------- | ------------ | ---------------------------------------------------- |
+| `/login`                                           | `opas_auth()`, `opas_login()`               | implementato | Autenticazione.                                      |
+| `/refresh-token`                                   | `opas_refresh()`                            | implementato | Uso interno per refresh token.                       |
+| `/logout`                                          | `opas_logout()`                             | implementato | Best effort; pulizia stato locale sempre effettuata. |
+| `/stations`                                        | `opas_stations()`                           | implementato | Catalogo stazioni.                                   |
+| `/stations/{region}`                               | `opas_stations(region = ...)`               | implementato | `region` normalizzato a due cifre.                   |
+| `/stations/{station_id}`                           | `opas_station()`                            | implementato | Dettaglio stazione + parametri.                      |
+| `/stations-parameters/{station_id}/{parameter_id}` | `opas_station_parameters()`                 | implementato | Dettaglio stazione filtrato per parametro.           |
+| `/sites`                                           | `opas_sites()`                              | implementato | Siti fisici; `network_names` come list-column.       |
+| `/campaigns/{station_id}`                          | `opas_campaigns()`                          | implementato | Può restituire `allocations = null`.                 |
+| `/campaigns/{station_id}/{date_time}`              | `opas_campaigns(at = ...)`                  | implementato | `date_time` in formato ISO 8601.                     |
+| `/series/{region}`                                 | `opas_series(region = ...)`                 | implementato | Catalogo serie per regione.                          |
+| `/series/{station_id}`                             | `opas_series(station = ...)`                | implementato | Catalogo serie per stazione.                         |
+| `/series-data/...`                                 | `opas_get_data()`                           | implementato | Dati raw orari.                                      |
+| `/series-data-dd/...`                              | `opas_get_data(daily = TRUE)` / `last_days` | implementato | Aggregati giornalieri.                               |
+| `/series-data-synchro/...`                         | `opas_sync_series()`                        | implementato | Sincronizzazione incrementale singola serie.         |
+| `/series-data-synchro-all/{station_id}/...`        | `opas_sync_station()`                       | implementato | Sincronizzazione incrementale per stazione.          |
+| `/series-data-synchro-all/{region}/...`            | `opas_sync_region()`                        | implementato | Sincronizzazione incrementale per regione.           |
+| `/statistics-station-data/Y/...`                   | `opas_get_station_stats()`                  | implementato | Statistiche annuali per stazione.                    |
+| `/statistics-series-data/Y/...`                    | `opas_get_series_stats()`                   | implementato | Statistiche annuali per serie.                       |
+| `/limits`                                          | `opas_limits()`                             | implementato | Tabella limiti normativi.                            |
+| `/statistics`                                      | `opas_statistics()`                         | implementato | Tipi statistici.                                     |
+| `/statistics-limits`                               | `opas_statistics_limits()`                  | implementato | Relazioni statistica-inquinante-limite.              |
+| `/stations-log/{station_id}/{start}/{end}`         | `opas_station_log()`                        | implementato | Verificato con timestamp ISO 8601 nel path.          |
 
 ## Identificativi delle serie
 
@@ -76,9 +76,9 @@ Tuttavia, nelle risposte di `/series-data`, il campo `series_id` può assumere u
 
 Esempio osservato:
 
-- `/series/{region}` restituisce una serie O3 con `series_id = 12375` per la stazione `1165`.
-- La chiamata `/series-data/12375/...` restituisce dati corretti per quella stazione e quel parametro.
-- Nella risposta dati, però, il campo `series_id` vale `7`.
+* `/series/{region}` restituisce una serie O3 con `series_id = 12375` per la stazione `1165`.
+* La chiamata `/series-data/12375/...` restituisce dati corretti per quella stazione e quel parametro.
+* Nella risposta dati, però, il campo `series_id` vale `7`.
 
 ### Chiarimento sviluppatori
 
@@ -146,10 +146,10 @@ Fonte: Chiarimento sviluppatori.
 
 Gli sviluppatori OPAS hanno confermato questa interpretazione:
 
-- `unit` = unità del valore restituito dagli endpoint dati;
-- `conversion_factor_curr` = fattore attuale di conversione, cioè il fattore in uso al momento;
-- `conversion_unit` = unità dopo conversione;
-- valore convertito = `measure_value * conversion_factor_curr`.
+* `unit` = unità del valore restituito dagli endpoint dati;
+* `conversion_factor_curr` = fattore attuale di conversione, cioè il fattore in uso al momento;
+* `conversion_unit` = unità dopo conversione;
+* valore convertito = `measure_value * conversion_factor_curr`.
 
 Esempio osservato per O3:
 
@@ -165,8 +165,8 @@ Gli endpoint dati come `/series-data` restituiscono `measure_value`, esposto in 
 
 Osservazione importante:
 
-- `/series-data` non restituisce direttamente `conversion_factor_curr` o `conversion_unit`.
-- La conversione richiede quindi un join con il catalogo serie o parametri, oppure un fattore esplicito fornito dall’utente.
+* `/series-data` non restituisce direttamente `conversion_factor_curr` o `conversion_unit`.
+* La conversione richiede quindi un join con il catalogo serie o parametri, oppure un fattore esplicito fornito dall’utente.
 
 ### Conversioni storiche
 
@@ -176,9 +176,9 @@ Fonte: Chiarimento sviluppatori.
 
 Gli sviluppatori OPAS hanno confermato che:
 
-- `date_from` e `date_to` sono estremi inclusivi;
-- `-infinity` e `infinity` indicano intervalli aperti;
-- `conversion_factor_curr` contiene il fattore attuale, cioè quello in uso al momento.
+* `date_from` e `date_to` sono estremi inclusivi;
+* `-infinity` e `infinity` indicano intervalli aperti;
+* `conversion_factor_curr` contiene il fattore attuale, cioè quello in uso al momento.
 
 È stato inoltre citato uno specifico cambio dei fattori avvenuto il 1 aprile 2024 alle ore 00:00. Questo va interpretato come caso storico specifico, non come regola generale sulla periodicità o sulla data dei cambi di fattore.
 
@@ -228,10 +228,10 @@ Fonte: Chiarimento sviluppatori.
 
 Gli sviluppatori OPAS hanno chiarito che i principali campi di validità hanno questo significato operativo:
 
-- `measure_code` = codici periferia;
-- `auto_validity_code` = codici di autovalidazione;
-- `post_validity_code` = codici di validazione utente;
-- `final_validity_code` = codici finali.
+* `measure_code` = codici periferia;
+* `auto_validity_code` = codici di autovalidazione;
+* `post_validity_code` = codici di validazione utente;
+* `final_validity_code` = codici finali.
 
 È stato inoltre precisato che `final_validity_code` dipende da ogni agenzia e normalmente indica livelli di validazione giornaliera, mensile o annuale.
 
@@ -243,11 +243,11 @@ Per filtri operativi generici, `ropas` usa `post_validity_code`, in quanto rappr
 
 Convenzione operativa adottata:
 
-| `post_validity_code` | Interpretazione operativa |
-|---:|---|
-| `0` | dato valido |
-| `1` | dato ricostruito |
-| `< 0` | dato non valido / da scartare |
+| `post_validity_code` | Interpretazione operativa     |
+| -------------------: | ----------------------------- |
+|                  `0` | dato valido                   |
+|                  `1` | dato ricostruito              |
+|                `< 0` | dato non valido / da scartare |
 
 Filtro per dati utilizzabili:
 
@@ -266,11 +266,11 @@ post_validity_code == 0
 In dati recenti O3 sono state osservate combinazioni come:
 
 | `post_validity_code` | `auto_validity_code` | `final_validity_code` |
-|---:|---:|---:|
-| `0` | `0` | `1` |
-| `0` | `0` | `0` |
-| `-4` | `0` | `1` |
-| `-4` | `0` | `0` |
+| -------------------: | -------------------: | --------------------: |
+|                  `0` |                  `0` |                   `1` |
+|                  `0` |                  `0` |                   `0` |
+|                 `-4` |                  `0` |                   `1` |
+|                 `-4` |                  `0` |                   `0` |
 
 Questo è coerente con il chiarimento ricevuto: `final_validity_code` non deve essere interpretato in modo uniforme come flag valido/non valido, perché la sua semantica può cambiare tra agenzie.
 
@@ -323,9 +323,89 @@ YYYY-MM-DDTHH:MM:SS
 
 ### Decisione `ropas`
 
-- timestamp di misura → `Etc/GMT-1`;
-- timestamp di inserimento/aggiornamento DB → `UTC`;
-- parsing sempre robusto: se una colonna opzionale manca, non viene generato errore.
+* timestamp di misura → `Etc/GMT-1`;
+* timestamp di inserimento/aggiornamento DB → `UTC`;
+* parsing sempre robusto: se una colonna opzionale manca, non viene generato errore.
+
+## Cadenza delle serie e aggregazione temporale
+
+### Campi di cadenza
+
+La cadenza nativa della serie non è riportata direttamente nei dati restituiti da `/series-data`, ma è disponibile nel catalogo serie, cioè nelle risposte di `/series/{region}` e `/series/{station_id}`, tramite i campi:
+
+```text
+parameter_cadence_type_desc
+parameter_cadence_type_min
+```
+
+Questi campi devono essere usati per distinguere serie native orarie, giornaliere o con altra cadenza.
+
+### Comportamento osservato per PM10
+
+Fonte: Osservato.
+
+Per PM10 in Friuli-Venezia Giulia sono state osservate almeno due cadenze:
+
+| `parameter_cadence_type_desc` | `parameter_cadence_type_min` | Numero serie osservate |
+| ----------------------------- | ---------------------------: | ---------------------: |
+| `giornaliera`                 |                       `1440` |                     31 |
+| `oraria`                      |                         `60` |                     19 |
+
+Sono state confrontate due serie PM10:
+
+* serie nativa oraria:
+  * `series_id = 12775`;
+  * `station_id = 1164`;
+  * `station_name = "Udine - via S.Daniele"`;
+  * `parameter_cadence_type_desc = "oraria"`;
+  * `parameter_cadence_type_min = 60`.
+
+* serie nativa giornaliera:
+  * `series_id = 12397`;
+  * `station_id = 1165`;
+  * `station_name = "Udine - via Cairoli"`;
+  * `parameter_cadence_type_desc = "giornaliera"`;
+  * `parameter_cadence_type_min = 1440`.
+
+Per la serie PM10 a cadenza giornaliera, interrogando l’endpoint orario `/series-data`, sono stati osservati valori giornalieri replicati sulle ore. Dopo aver raggruppato i record per giorno OPAS, ciascun giorno completo presenta un unico valore distinto, ripetuto sulle 24 ore. Il valore unico osservato nelle ore di ciascun giorno coincide con il valore restituito dall’endpoint giornaliero `/series-data-dd`.
+
+Per la serie PM10 a cadenza oraria, interrogando l’endpoint giornaliero `/series-data-dd`, sono stati osservati valori coerenti con la media giornaliera dei valori orari, salvo differenze trascurabili dovute ad arrotondamenti e salvo giorni incompleti ai bordi del periodo richiesto.
+
+### Implicazioni
+
+La scelta tra endpoint orario e giornaliero non identifica da sola la cadenza nativa della serie.
+
+In particolare:
+
+* una serie nativa giornaliera interrogata con endpoint orario può restituire il valore giornaliero replicato sulle ore;
+* una serie nativa oraria interrogata con endpoint giornaliero restituisce un aggregato giornaliero calcolato dal backend.
+
+Per distinguere dato nativo, dato aggregato e dato replicato, i client dovrebbero usare la cadenza disponibile nel catalogo serie.
+
+Le funzioni high-level di `ropas` dovrebbero preservare almeno:
+
+```text
+parameter_cadence_type_desc
+parameter_cadence_type_min
+```
+
+nei dati arricchiti.
+
+### Nota sui giorni OPAS
+
+Quando si aggregano o confrontano dati per giorno, il giorno deve essere ricavato usando il fuso operativo OPAS:
+
+```r
+as.Date(datetime, tz = "Etc/GMT-1")
+```
+
+non semplicemente:
+
+```r
+as.Date(datetime)
+```
+
+Questo evita disallineamenti attorno alla mezzanotte dovuti al fuso orario usato dalla sessione R.
 
 ## Note specifiche sugli endpoint
 
@@ -333,46 +413,49 @@ YYYY-MM-DDTHH:MM:SS
 
 Osservazioni:
 
-- restituisce valori raw in `measure_value`;
-- in `ropas`, `measure_value` viene esposto come `value_raw`;
-- non restituisce direttamente `conversion_factor_curr` o `conversion_unit`;
-- il `series_id` nella risposta può essere diverso dall’identificativo usato nella chiamata.
+* restituisce valori raw in `measure_value`;
+* in `ropas`, `measure_value` viene esposto come `value_raw`;
+* non restituisce direttamente `conversion_factor_curr` o `conversion_unit`;
+* il `series_id` nella risposta può essere diverso dall’identificativo usato nella chiamata;
+* per serie native giornaliere, l’endpoint orario può restituire il valore giornaliero replicato sulle ore.
 
 Chiarimento sviluppatori:
 
-- il comportamento è confermato nello stato attuale;
-- sarebbe preferibile che `series_id` nella risposta dati coincidesse con l’identificativo usato nella chiamata;
-- la discrepanza potrebbe essere corretta lato API in futuro.
+* il comportamento sulla discrepanza di `series_id` è confermato nello stato attuale;
+* sarebbe preferibile che `series_id` nella risposta dati coincidesse con l’identificativo usato nella chiamata;
+* la discrepanza potrebbe essere corretta lato API in futuro.
 
 ### `/series-data-dd`
 
 Osservazioni:
 
-- endpoint per aggregati giornalieri;
-- i record sono timestampati a mezzanotte del giorno di riferimento;
-- stessa convenzione temporale dei dati orari: `Etc/GMT-1`.
+* endpoint per aggregati giornalieri;
+* i record sono timestampati a mezzanotte del giorno di riferimento;
+* stessa convenzione temporale dei dati orari: `Etc/GMT-1`;
+* per serie native orarie, restituisce aggregati giornalieri calcolati dal backend;
+* per serie native giornaliere, restituisce il valore giornaliero coerente con quello replicato dall’endpoint orario.
 
 ### `/series-data-synchro`
 
 Osservazioni:
 
-- restituisce record inseriti o modificati dopo una certa data;
-- include timestamp come `measure_insert_ts` e `measure_update_ts`;
-- può includere `measure_update_obj` come oggetto/list-column;
-- i metadati di conversione possono mancare;
-- alcune risposte possono essere gzip-compressed senza header `Content-Encoding` utilizzabile.
+* restituisce record inseriti o modificati dopo una certa data;
+* include timestamp come `measure_insert_ts` e `measure_update_ts`;
+* può includere `measure_update_obj` come oggetto/list-column;
+* i metadati di conversione possono mancare;
+* alcune risposte possono essere gzip-compressed senza header `Content-Encoding` utilizzabile.
 
 Decisione `ropas`:
 
-- fallback manuale per gzip non dichiarato;
-- warning controllabile con `options(ropas.warn_unexpected_gzip = FALSE)`.
+* fallback manuale per gzip non dichiarato;
+* warning controllabile con `options(ropas.warn_unexpected_gzip = FALSE)`.
 
 ### `/campaigns/{station_id}`
 
 Osservazioni:
 
-- il campo top-level è `allocations`;
-- se non ci sono allocazioni, l’API può restituire:
+* il campo top-level è `allocations`;
+* se non ci sono allocazioni, l’API può restituire:
 
 ```text
 allocations = null
@@ -380,7 +463,7 @@ allocations = null
 
 invece di un array vuoto;
 
-- in `ropas`, questo caso viene trattato come assenza di dati: warning + tibble vuoto.
+* in `ropas`, questo caso viene trattato come assenza di dati: warning + tibble vuoto.
 
 È stata osservata almeno una stazione con risposta non vuota:
 
@@ -411,9 +494,9 @@ I campi `campaign_id` e `campaign_name`, pur presenti nello schema OpenAPI, poss
 
 Osservazioni:
 
-- usando timestamp Unix epoch nel path è stato ottenuto HTTP 404;
-- usando timestamp ISO 8601 nel path l’endpoint funziona;
-- il campo top-level restituito è `stations`.
+* usando timestamp Unix epoch nel path è stato ottenuto HTTP 404;
+* usando timestamp ISO 8601 nel path l’endpoint funziona;
+* il campo top-level restituito è `stations`.
 
 Esempio di formato funzionante:
 
@@ -452,18 +535,18 @@ log_note_update_ts
 
 Osservazioni:
 
-- il campo top-level è `sites`;
-- `id` e `name` sono rinominati in `ropas` come `site_id` e `site_name`;
-- `network_names` è una list-column.
+* il campo top-level è `sites`;
+* `id` e `name` sono rinominati in `ropas` come `site_id` e `site_name`;
+* `network_names` è una list-column.
 
 ### `/stations-parameters/{station_id}/{parameter_id}`
 
 Osservazioni:
 
-- il campo top-level è `station`;
-- la struttura è analoga a `/stations/{station_id}`;
-- contiene un oggetto stazione e un array `parameters`;
-- `parameters` può contenere più righe per la stessa combinazione osservata, che vengono preservate senza deduplicazione nel layer low-level.
+* il campo top-level è `station`;
+* la struttura è analoga a `/stations/{station_id}`;
+* contiene un oggetto stazione e un array `parameters`;
+* `parameters` può contenere più righe per la stessa combinazione osservata, che vengono preservate senza deduplicazione nel layer low-level.
 
 ## Decisioni implementative in `ropas`
 
@@ -471,32 +554,32 @@ Osservazioni:
 
 Le funzioni low-level cercano di essere fedeli all’API:
 
-- nessuna conversione automatica delle unità;
-- nessun filtro automatico sui codici di validità;
-- nessun join automatico con metadati esterni;
-- parsing minimo ma robusto;
-- oggetti annidati conservati come list-column.
+* nessuna conversione automatica delle unità;
+* nessun filtro automatico sui codici di validità;
+* nessun join automatico con metadati esterni;
+* parsing minimo ma robusto;
+* oggetti annidati conservati come list-column.
 
 ### Naming in `ropas`
 
 Alcuni campi API vengono rinominati per coerenza interna:
 
-| Campo API | Nome in `ropas` | Note |
-|---|---|---|
-| `measure_value` | `value_raw` | valore raw, non convertito |
-| `measure_date_time` | `datetime` | timestamp misura |
-| `unit` | `parameter_unit` | unità raw |
-| `conversion_factor_curr` | `parameter_conv_curr` | fattore attuale |
-| `conversion_unit` | `parameter_conv_unit` | unità dopo conversione |
-| `id` | prefisso semantico, es. `station_id`, `site_id`, `parameter_id` | dipende dall’endpoint |
-| `name` | prefisso semantico, es. `station_name`, `site_name`, `parameter_name` | dipende dall’endpoint |
+| Campo API                | Nome in `ropas`                                                       | Note                       |
+| ------------------------ | --------------------------------------------------------------------- | -------------------------- |
+| `measure_value`          | `value_raw`                                                           | valore raw, non convertito |
+| `measure_date_time`      | `datetime`                                                            | timestamp misura           |
+| `unit`                   | `parameter_unit`                                                      | unità raw                  |
+| `conversion_factor_curr` | `parameter_conv_curr`                                                 | fattore attuale            |
+| `conversion_unit`        | `parameter_conv_unit`                                                 | unità dopo conversione     |
+| `id`                     | prefisso semantico, es. `station_id`, `site_id`, `parameter_id`       | dipende dall’endpoint      |
+| `name`                   | prefisso semantico, es. `station_name`, `site_name`, `parameter_name` | dipende dall’endpoint      |
 
 ### Autenticazione
 
 Sono supportati due workflow:
 
-- workflow interattivo con stato interno (`opas_login()`);
-- workflow esplicito con oggetto `auth` (`opas_auth()`), preferibile per processi paralleli o pipeline.
+* workflow interattivo con stato interno (`opas_login()`);
+* workflow esplicito con oggetto `auth` (`opas_auth()`), preferibile per processi paralleli o pipeline.
 
 Le funzioni high-level non devono chiamare `opas_login()` internamente né modificare lo stato globale.
 
@@ -504,11 +587,11 @@ Le funzioni high-level non devono chiamare `opas_login()` internamente né modif
 
 Le funzioni high-level possono:
 
-- eseguire join con cataloghi/metadati;
-- aggiungere fattori di conversione;
-- calcolare valori convertiti;
-- applicare filtri di qualità opzionali;
-- gestire errori parziali in loop su molte serie/stazioni.
+* eseguire join con cataloghi/metadati;
+* aggiungere fattori di conversione;
+* calcolare valori convertiti;
+* applicare filtri di qualità opzionali;
+* gestire errori parziali in loop su molte serie/stazioni.
 
 Tuttavia devono preservare, dove possibile, i valori raw e gli identificativi originali restituiti dall’API.
 
@@ -518,6 +601,15 @@ In particolare, finché la discrepanza tra identificativo serie del catalogo e `
 catalogue_series_id
 ```
 
+Le funzioni high-level dovrebbero inoltre preservare la cadenza nativa della serie:
+
+```text
+parameter_cadence_type_desc
+parameter_cadence_type_min
+```
+
+per consentire all’utente di distinguere dati nativi, dati aggregati e dati replicati.
+
 ## Stato dei chiarimenti ricevuti
 
 ### Identificativi delle serie
@@ -526,10 +618,10 @@ Stato: risposta ricevuta.
 
 Sintesi:
 
-- l’identificativo restituito da `/series/{region}` è quello da usare per interrogare `/series-data/{id}/...`;
-- `series_id` nella risposta dati può attualmente essere un identificativo interno diverso;
-- sarebbe preferibile che i due identificativi coincidessero;
-- la discrepanza potrebbe essere corretta lato API in futuro.
+* l’identificativo restituito da `/series/{region}` è quello da usare per interrogare `/series-data/{id}/...`;
+* `series_id` nella risposta dati può attualmente essere un identificativo interno diverso;
+* sarebbe preferibile che i due identificativi coincidessero;
+* la discrepanza potrebbe essere corretta lato API in futuro.
 
 ### Codici di validità
 
@@ -537,11 +629,11 @@ Stato: risposta ricevuta.
 
 Sintesi:
 
-- `measure_code` = codici periferia;
-- `auto_validity_code` = codici di autovalidazione;
-- `post_validity_code` = codici di validazione utente;
-- `final_validity_code` = codici finali;
-- `final_validity_code` dipende dall’agenzia e normalmente indica livelli di validazione giornaliera, mensile o annuale.
+* `measure_code` = codici periferia;
+* `auto_validity_code` = codici di autovalidazione;
+* `post_validity_code` = codici di validazione utente;
+* `final_validity_code` = codici finali;
+* `final_validity_code` dipende dall’agenzia e normalmente indica livelli di validazione giornaliera, mensile o annuale.
 
 ### Fattori di conversione
 
@@ -549,22 +641,23 @@ Stato: risposta ricevuta.
 
 Sintesi:
 
-- `unit` è l’unità del valore restituito dagli endpoint dati;
-- `conversion_factor_curr` è il fattore attuale;
-- `conversion_unit` è l’unità dopo conversione;
-- valore convertito = `measure_value * conversion_factor_curr`;
-- `conversion_history` va usata quando il periodo richiesto attraversa cambi di fattore;
-- `date_from` e `date_to` sono inclusivi;
-- `-infinity` e `infinity` indicano intervalli aperti.
+* `unit` è l’unità del valore restituito dagli endpoint dati;
+* `conversion_factor_curr` è il fattore attuale;
+* `conversion_unit` è l’unità dopo conversione;
+* valore convertito = `measure_value * conversion_factor_curr`;
+* `conversion_history` va usata quando il periodo richiesto attraversa cambi di fattore;
+* `date_from` e `date_to` sono inclusivi;
+* `-infinity` e `infinity` indicano intervalli aperti.
 
 ## TODO
 
-- Verificare la struttura reale di `conversion_history` per più parametri.
-- Definire formalmente la semantica di `opas_convert()` e `opas_convert_historical()`.
-- Decidere se `opas_get_year()` deve aggiungere sempre `catalogue_series_id`.
-- Aggiornare README e documentazione utente quando saranno implementate le funzioni high-level.
-- Valutare se aggiungere ulteriori contract test live per:
-  - `opas_sync_station()`;
-  - `opas_get_data()` con range custom orario;
-  - `opas_get_data()` con range custom giornaliero;
-  - `opas_campaigns()` con filtro `at`.
+* Verificare la struttura reale di `conversion_history` per più parametri.
+* Definire formalmente la semantica di `opas_convert()` e `opas_convert_historical()`.
+* Decidere se `opas_get_year()` deve aggiungere sempre `catalogue_series_id`.
+* Decidere se le funzioni high-level devono emettere warning quando si richiedono dati orari per serie native giornaliere.
+* Aggiornare README e documentazione utente quando saranno implementate le funzioni high-level.
+* Valutare se aggiungere ulteriori contract test live per:
+  * `opas_sync_station()`;
+  * `opas_get_data()` con range custom orario;
+  * `opas_get_data()` con range custom giornaliero;
+  * `opas_campaigns()` con filtro `at`.
